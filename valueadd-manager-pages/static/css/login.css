@@ -1,0 +1,159 @@
+html, body {
+    height: 100%;
+    font-family: 'Microsoft YaHei UI';
+    padding: 0px;
+    margin: 0px;
+}
+
+.main {
+
+    background: -moz-linear-gradient(top, #6687A6, #2B4965);
+    background: -webkit-linear-gradient(top, #6687A6,#2B4965);
+    background: -o-linear-gradient(top, #6687A6,#2B4965);
+    background: -ms-linear-gradient(top, #6687A6,#2B4965);
+    background: linear-gradient(top, #6687A6,#2B4965);
+    width: 100%;
+    height: 100%;
+    padding: 0px;
+    margin: 0px;
+}
+
+.title {
+    margin: 0px;
+    text-align: center;
+    color: #94D7F9;
+}
+
+.title h2 {
+    font-size: 35px;
+    margin: 0px;
+}
+
+.login-banner {
+    margin: 0px auto;
+    padding-top: 250px;
+    width: 700px;
+    height: 100%;
+
+    /*background: url('../images/backgroud.jpg');*/
+    background: -moz-linear-gradient(top, #B3DAFF,#2B4965 80%, #2A2F34);
+    background: -webkit-linear-gradient(top, #B3DAFF,#2B4965 80%,#2A2F34);
+    background: -o-linear-gradient(top, #B3DAFF,#2B4965 80%,#2A2F34);
+    background:  -ms-linear-gradient(top, #B3DAFF,#2B4965 80%,#2A2F34);
+    background: linear-gradient(top,  #B3DAFF,#2B4965 80%, #2A2F34);
+}
+
+.login-content {
+    width:80%;
+    margin: 0px auto;
+    padding: 30px 0px;
+    margin-top: 0px;
+}
+
+.login-content .control-label {
+    color: #fff;
+    font-size: 14px;
+}
+
+.login-content .form-group {
+    margin-bottom: 30px;
+}
+
+.login-content .form-group .input-text {
+    width: 100%;
+    border: none;
+    height: 50px;
+    padding: 10px 10px 10px 50px;
+    background-color: #E6EBEF;
+    color: #2A2F34;
+
+    border: 1px solid rgba(0,0,0,0.2);
+}
+
+.login-content .form-group .input-text::-webkit-input-placeholder { /* WebKit browsers */
+    color: #999;
+}
+
+.login-content .form-group .input-text:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    color: #999;
+}
+
+.login-content .form-group .input-text::-moz-placeholder { /* Mozilla Firefox 19+ */
+    color: #999;
+}
+
+.login-content .form-group .input-text:-ms-input-placeholder { /* Internet Explorer 10+ */
+    color: #999;
+}
+.login-content .user-content, .login-content .pwd-content {
+    position:relative;
+}
+.login-content .input-icon{
+    color:#999;
+    position:absolute;
+    left:35px;
+    top:17px;
+    font-size:15px;
+}
+.login-content .user-content .input-text {
+    border-radius: 10px 10px 0 0;
+}
+
+.login-content .pwd-content .input-text {
+    border-radius: 0 0 10px 10px;
+    border-top: none;
+}
+
+.login-content .form-group .form-control:focus {
+    border: 1px solid rgba(0,0,0,0.2);
+}
+
+.login-content .form-group .button {
+    border-radius: 5px;
+    height: 50px;
+    border: none;
+    font-size:16px;
+    background: -moz-linear-gradient(top, #68A5D0, #4F80A3);
+    background: -webkit-linear-gradient(top, #68A5D0,#4F80A3);
+    background: -o-linear-gradient(top, #68A5D0,#4F80A3);
+    background: -ms-linear-gradient(top, #68A5D0,#4F80A3);
+    background: linear-gradient(top, #68A5D0,#4F80A3);
+    -webkit-box-shadow: 1px 1px 1px rgba(0,0,0,0.4);
+    box-shadow: 1px 1px 1px rgba(0,0,0,0.4);
+}
+
+.login-content label {
+    font-weight: 500;
+}
+
+.login-content .errorinfo {
+    padding-top: 10px;
+    padding-left: 15px;
+    font-size: 14px;
+    float: left;
+    color: #fe978d;
+}
+
+.login-content .button {
+    width: 100%;
+}
+footer {
+    position: absolute;
+    bottom: 10px;
+    left: 0px;
+    width: 100%;
+    text-align: center;
+}
+footer p, footer p a {
+    color: #eee;
+}
+
+
+@media (max-width: 768px) {
+    .login-banner  {
+        width: 100%;
+        padding-top: 200px;
+    }
+
+
+}

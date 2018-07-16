@@ -1,0 +1,8 @@
+export const REQUEST_FAILURE = 'REQUEST_FAILURE';
+export const SET_OPERTE_RESULT = 'SET_OPERTE_RESULT';
+export const SHOW_LOADING = 'SHOW_LOADING';
+export const HIDE_LOADING = 'HIDE_LOADING';
+
+
+export const SET_USER_INFO = 'SET_USER_INFO';
+export const LOGIN_OUT = 'LOGIN_OUT';
