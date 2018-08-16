@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="renderer" content="webkit">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>valueadd-admin</title>
+  <!--[if lt IE 9]>
+  <script>
+    window.onload= function(){
+      document.getElementById("browser_ie").style.display = "block";
+    }
+  </script>
+  <![endif]-->
+  <style>
+    .browser_list span {
+      display: block;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="browser_ie" style="display: none">
+    <div class="brower_info">
+      <div class="notice_info">
+        <p>你的浏览器版本过低，可能导致网站不能正常访问！
+          <br/> 为了你能正常使用网站功能，请使用这些浏览器。
+        </p>
+      </div>
+      <div class="browser_list">
+        <span>
+          <a href='http://www.google.cn/chrome/' target="_blank">
+            <img src="/static/images/browser/Chrome.png" />
+            <br> Chrome
+          </a>
+        </span>
+        <span>
+          <a href='http://www.firefox.com.cn/' target="_blank">
+            <img src="/static/images/browser/Firefox.png" />
+            <br> Firefox
+          </a>
+        </span>
+        <span>
+          <a href='https://www.apple.com/cn/support/mac-apps/safari/' target="_blank">
+            <img src="/static/images/browser/Safari.png" />
+            <br> Safari
+          </a>
+        </span>
+        <span>
+          <a href='http://windows.microsoft.com/zh-cn/internet-explorer/download-ie' target="_blank">
+            <img src="/static/images/browser/IE.png" />
+            <br> IE9以上
+          </a>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div id="app"></div>
+  <!-- built files will be auto injected -->
+</body>
+
+</html>
