@@ -20,7 +20,7 @@
           <svg-icon icon-class="eye" />
         </span>
       </el-form-item>
-      <el-button type="primary" style="width:100%;margin-bottom:30px;" :loading="loading" @click.native.prevent="onSubmit">{{$t('login.logIn')}}</el-button>
+      <el-button type="primary" style="width:100%;margin-bottom:30px;" :loading="loading" @click.native.prevent="handleLogin">{{$t('login.logIn')}}</el-button>
     </el-form>
   </div>
 </template>
@@ -34,7 +34,7 @@ export default {
     data() {
         const validateUsername = (rule, value, callback) => {
             if (!isvalidUsername(value)) {
-                callback(new Error("用户名不能为空"));
+                callback(new Error("用户名不能为空/用户名不正确"));
             } else {
                 callback();
             }
