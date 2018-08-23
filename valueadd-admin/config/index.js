@@ -10,7 +10,14 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    //后台接口代理
+    proxyTable: {
+      '/manager/*': {
+        target: 'http://localhost:58080',
+        secure: false,
+        prependPath: false
+      }
+    },
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
