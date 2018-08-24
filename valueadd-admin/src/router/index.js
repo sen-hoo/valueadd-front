@@ -13,6 +13,16 @@ export const constantRouterMap = [{
     component: () =>
       import ('@/views/login/index'),
     hidden: true
+  },
+  {
+    path: '/401',
+    component: () => import('@/views/errorPage/401'),
+    hidden: true
+  },
+  {
+    path: '/404',
+    component: () => import('@/views/errorPage/404'),
+    hidden: true
   }
 ]
 
