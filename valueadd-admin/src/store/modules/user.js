@@ -23,7 +23,7 @@ const user = {
     }
   },
 
-  mutatios: {
+  mutations: {
     SET_CODE: (state, code) => {
       state.code = code
     },
@@ -57,9 +57,9 @@ const user = {
       const username = userInfo.username.trim()
       return new Promise((resolve, reject) => {
         loginByUsername(username, userInfo.password).then(response => {
-          const data = response.data
+          const data = response.data.data
           commit('SET_TOKEN', data.token)
-          setToken(response.data.token)
+          setToken(data.token)
           resolve()
         }).catch(error => {
           reject(error)
