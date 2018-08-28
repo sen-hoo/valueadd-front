@@ -4,6 +4,9 @@ import HelloWorld from '@/components/HelloWorld'
 
 Vue.use(Router)
 
+/* Layout */
+import Layout from '@/views/layout/Layout'
+
 export const constantRouterMap = [{
     path: '/login',
     component: () =>
@@ -58,3 +61,35 @@ export default new Router({
   }),
   routes: constantRouterMap
 })
+
+export const asyncRouterMap = [{
+  path: '/permission',
+  component: Layout,
+  redirect: '/permission/index',
+  alwaysShow: true, // will always show the root menu
+  meta: {
+    title: 'permission',
+    icon: 'lock',
+    roles: ['admin', 'editor'] // you can set roles in root nav
+  },
+  children: [{
+      path: 'page',
+      component: () =>
+        import ('@/views/permission/page'),
+      name: 'pagePermission',
+      meta: {
+        title: 'pagePermission',
+        roles: ['admin'] // or you can only set roles in sub nav
+      }
+    },
+    {
+      path: 'directive',
+      component: () =>
+        import ('@/views/permission/directive'),
+      name: 'directivePermission',
+      meta: {
+        title: 'directivePermission'
+        // if do not set roles, means: this page does not require permission
+      }
+    }]
+}]
