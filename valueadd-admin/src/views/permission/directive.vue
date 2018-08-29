@@ -18,7 +18,7 @@
     </div>
 
     <div style="margin-top:30px;" :key="'checkPermission'+key">
-      <code>In some cases it is not suitable to use v-permission, such as element Tab component which can only be achieved by manually setting the v-if.
+      <code>In some cases it is not suitable to use v-permission, such as element Tab component  which can only be achieved by manually setting the v-if.
         <br> e.g.
       </code>
       <el-tabs type="border-card" style="width:500px;">
@@ -31,42 +31,42 @@
 </template>
 
 <script>
-import permission from "@/directive/permission/index.js"; // 权限判断指令
-import checkPermission from "@/utils/permission"; // 权限判断函数
-import SwitchRoles from "./components/SwitchRoles";
+import permission from '@/directive/permission/index.js' // 权限判断指令
+import checkPermission from '@/utils/permission' // 权限判断函数
+import SwitchRoles from './components/SwitchRoles'
 
-export default {
-    name: "directivePermission",
-    components: { SwitchRoles },
-    directives: { permission },
-    data() {
-        return {
-            key: 1 // 为了能每次切换权限的时候重新初始化指令
-        };
-    },
-    methods: {
-        checkPermission,
-        handleRolesChange() {
-            this.key++;
-        }
+export default{
+  name: 'directivePermission',
+  components: { SwitchRoles },
+  directives: { permission },
+  data() {
+    return {
+      key: 1 // 为了能每次切换权限的时候重新初始化指令
     }
-};
+  },
+  methods: {
+    checkPermission,
+    handleRolesChange() {
+      this.key++
+    }
+  }
+}
 </script>
 
 <style rel="stylesheet/scss" lang="scss" scoped>
 .app-container {
-    /deep/ .permission-alert {
-        width: 320px;
-        margin-top: 30px;
-        background-color: #f0f9eb;
-        color: #67c23a;
-        padding: 8px 16px;
-        border-radius: 4px;
-        display: block;
-    }
-    /deep/ .permission-tag {
-        background-color: #ecf5ff;
-    }
+  /deep/ .permission-alert {
+    width: 320px;
+    margin-top: 30px;
+    background-color: #f0f9eb;
+    color: #67c23a;
+    padding: 8px 16px;
+    border-radius: 4px;
+    display: block;
+  }
+  /deep/ .permission-tag{
+    background-color: #ecf5ff;
+  }
 }
 </style>
 
