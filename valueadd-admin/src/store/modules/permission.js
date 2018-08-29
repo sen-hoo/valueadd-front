@@ -5,8 +5,8 @@ import {
 
 /**
  * 通过meta.role判断是否与当前用户权限匹配
- * @param {角色} roles 
- * @param {路由} route 
+ * @param roles
+ * @param route
  */
 function hasPermission(roles, route) {
   if (route.meta && route.meta.roles) {

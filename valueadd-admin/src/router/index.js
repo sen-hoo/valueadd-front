@@ -44,17 +44,6 @@ export const constantRouterMap = [{
   // },
 ]
 
-// export default new Router({
-//   routes: [
-//     {
-//       path: '/',
-//       name: 'HelloWorld',
-//       component: HelloWorld
-//     }
-
-//   ]
-// })
-
 export default new Router({
   scrollBehavior: () => ({
     y: 0
@@ -91,5 +80,6 @@ export const asyncRouterMap = [{
         title: 'directivePermission'
         // if do not set roles, means: this page does not require permission
       }
-    }]
+    }
+  ]
 }]
