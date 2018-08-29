@@ -1,8 +1,9 @@
 import router from './router'
 import store from './store'
 import {
-  message
+  Message
 } from 'element-ui'
+import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import {
   getToken

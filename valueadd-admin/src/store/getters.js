@@ -13,6 +13,6 @@ const getters = {
 //   introduction: state => state.user.introduction,
 //   status: state => state.user.status,
 //   setting: state => state.user.setting,
-//   errorLogs: state => state.errorLog.logs
+  errorLogs: state => state.errorLog.logs
 }
 export default getters
