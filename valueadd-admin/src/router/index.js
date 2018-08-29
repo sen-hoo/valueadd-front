@@ -26,20 +26,20 @@ export const constantRouterMap = [
   {
     path: "",
     redirect: "/login"
+  },
+  {
+    path: '/index',
+    component: Layout,
+    redirect: 'dashboard',
+    children: [
+      {
+        path: 'dashboard',
+        component: () => import('@/views/dashboard/index'),
+        name: 'dashboard',
+        meta: { title: 'dashboard', icon: 'dashboard', noCache: true }
+      }
+    ]
   }
-  // {
-  //   path: '',
-  //   component: Layout,
-  //   redirect: 'dashboard',
-  //   children: [
-  //     {
-  //       path: 'dashboard',
-  //       component: () => import('@/views/dashboard/index'),
-  //       name: 'dashboard',
-  //       meta: { title: 'dashboard', icon: 'dashboard', noCache: true }
-  //     }
-  //   ]
-  // },
 ];
 
 export default new Router({

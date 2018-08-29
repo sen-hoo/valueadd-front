@@ -41,7 +41,7 @@ export default {
             }
         };
         const validatePassword = (rule, value, callback) => {
-            if (value.length < 6) {
+            if (value.length < 4) {
                 callback(new Error("密码不能为空"));
             } else {
                 callback();
@@ -90,7 +90,7 @@ export default {
                         .then(
                             () => {
                                 this.loading = false;
-                                this.$router.push({ path: "/404" });
+                                this.$router.push({ path: "/index" });
                             },
                             errorMsg => {
                                 this.loading = false;
