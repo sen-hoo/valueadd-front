@@ -57,7 +57,6 @@ const user = {
       const username = userInfo.username.trim()
       return new Promise((resolve, reject) => {
         loginByUsername(username, userInfo.password).then(response => {
-          console.log('====================' + JSON.stringify(response))
           if (response.data.code != 0) {
             reject(response.data.msg)
           }
