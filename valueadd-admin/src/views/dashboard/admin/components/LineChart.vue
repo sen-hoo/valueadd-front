@@ -6,8 +6,9 @@
 import echarts from 'echarts'
 require('echarts/theme/macarons') // echarts theme
 import { debounce } from '@/utils'
+
 export default {
-    props: {
+  props: {
     className: {
       type: String,
       default: 'chart'
@@ -145,6 +146,5 @@ export default {
       this.setOptions(this.chartData)
     }
   }
-    
 }
 </script>

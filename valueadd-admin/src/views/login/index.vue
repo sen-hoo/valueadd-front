@@ -91,15 +91,15 @@ export default {
                             () => {
                                 this.loading = false;
                                 this.$router.push({ path: "/" });
-                            },
-                            errorMsg => {
-                                this.loading = false;
-                                Message({
-                                    message: errorMsg,
-                                    type: "error",
-                                    duration: 5 * 1000
-                                });
                             }
+                            // errorMsg => {
+                            //     this.loading = false;
+                            //     Message({
+                            //         message: 'login111111111111111',
+                            //         type: "error",
+                            //         duration: 5 * 1000
+                            //     });
+                            // }
                         )
                         .catch(() => {
                             this.loading = false;

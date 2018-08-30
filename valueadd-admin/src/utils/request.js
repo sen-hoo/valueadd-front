@@ -21,6 +21,7 @@ service.interceptors.request.use(
   },
   error => {
     // Do something with request error
+    console.log('request1111111111111111111') // for debug
     console.log(error) // for debug
     Promise.reject(error)
   }
@@ -63,14 +64,14 @@ service.interceptors.response.use(
   // }, 
   response => {
     const res = response.data
-    Message({
-      message: res.message,
-      type: 'error',
-      duration: 5 * 1000
-    })
+    // Message({
+    //   message: res.message,
+    //   type: 'error',
+    //   duration: 5 * 1000
+    // })
     if (res.code !== 0) {
       if (res.code === ServerCodeEnum.Token_Expired){//token过期
-        MessageBox.confirm('登陆超时，请重新登陆', '登陆超时', {
+        MessageBox.confirm('登陆超时，请重新登陆', '提示', {
           confirmButtonText: '重新登陆',
           cancelButtonText: '取消',
           type: 'warning'
@@ -79,8 +80,7 @@ service.interceptors.response.use(
             location.reload() //为了重新实例化vue-router对象 避免bug
           })
         })
-      }
-      if (res.code === ServerCodeEnum.Be_Logout) {//用户其他地方登陆
+      } else if (res.code === ServerCodeEnum.Be_Logout) {//用户其他地方登陆
         MessageBox.confirm('您已被登出，可以取消继续留在该页面，或者重新登录', '确定登出', {
           confirmButtonText: '重新登陆',
           cancelButtonText: '取消',
@@ -90,9 +90,8 @@ service.interceptors.response.use(
             location.reload() //为了重新实例化vue-router对象 避免bug
           })
         })
-      }
-      console.log('22222222222222222222' + JSON.stringify(res))
-      return Promise.reject(res.msg)
+      } else 
+        return Promise.reject(res.msg)
     } else {
       return response.data
     }
