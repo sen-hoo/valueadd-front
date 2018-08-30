@@ -24,11 +24,7 @@ export const constantRouterMap = [
     hidden: true
   },
   {
-    path: "",
-    redirect: "/login"
-  },
-  {
-    path: '/index',
+    path: '',
     component: Layout,
     redirect: 'dashboard',
     children: [

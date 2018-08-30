@@ -22,7 +22,7 @@ export function logout() {
 
 export function getUserInfo(token) {
   return request({
-    url: '/sysuer/info',
+    url: '/sysuser/getinfo',
     method: 'get',
     params: {
       token

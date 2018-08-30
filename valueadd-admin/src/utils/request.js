@@ -1,8 +1,9 @@
 import axios from 'axios'
 
-import { Message } from 'element-ui'
+import { Message, MessageBox } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
+import { ServerCodeEnum } from '@/common'
 
 const service = axios.create({
   baseURL: process.env.BASE_API, // api的base_url
@@ -26,7 +27,7 @@ service.interceptors.request.use(
 )
 
 service.interceptors.response.use(
-  response => response,
+  // response => response,
   /**
    * 下面的注释为通过在response里，自定义code来标示请求状态
    * 当code返回如下情况则说明权限有问题，登出并返回到登录页
@@ -60,6 +61,43 @@ service.interceptors.response.use(
   //     return response.data
   //   }
   // }, 
+  response => {
+    const res = response.data
+    Message({
+      message: res.message,
+      type: 'error',
+      duration: 5 * 1000
+    })
+    if (res.code !== 0) {
+      if (res.code === ServerCodeEnum.Token_Expired){//token过期
+        MessageBox.confirm('登陆超时，请重新登陆', '登陆超时', {
+          confirmButtonText: '重新登陆',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(()=>{
+          store.dispatch('FedLogOut').then(()=>{
+            location.reload() //为了重新实例化vue-router对象 避免bug
+          })
+        })
+      }
+      if (res.code === ServerCodeEnum.Be_Logout) {//用户其他地方登陆
+        MessageBox.confirm('您已被登出，可以取消继续留在该页面，或者重新登录', '确定登出', {
+          confirmButtonText: '重新登陆',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(()=>{
+          store.dispatch('FedLogOut').then(()=>{
+            location.reload() //为了重新实例化vue-router对象 避免bug
+          })
+        })
+      }
+      console.log('22222222222222222222' + JSON.stringify(res))
+      return Promise.reject(res.msg)
+    } else {
+      return response.data
+    }
+
+  },
   error => {
     console.log('err' + error) // for debug
     Message({
@@ -67,7 +105,7 @@ service.interceptors.response.use(
       type: 'error',
       duration: 5 * 1000
     })
-    return Promise.reject(error)
+    return Promise.reject('error')
   }
 )
 
