@@ -148,5 +148,12 @@ export default {
     close: 'Close',
     closeOthers: 'Close Others',
     closeAll: 'Close All'
+  },
+  dashboard: {
+    moNumber: 'MT',
+    mtNumber: 'MT',
+    mrNumber: 'MR',
+    syncMrNumber: 'Sync Partner',
+    totalIncome: 'Theory Income'
   }
 }

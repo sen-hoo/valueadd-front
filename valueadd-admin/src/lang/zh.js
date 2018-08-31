@@ -148,5 +148,13 @@ export default {
     close: '关闭',
     closeOthers: '关闭其它',
     closeAll: '关闭所有'
+  },
+  dashboard: {
+    moNumber: '上行',
+    mtNumber: '下行',
+    mrNumber: '状态报告',
+    syncMrNumber: '同步',
+    totalIncome: '理论收入'
   }
+
 }
