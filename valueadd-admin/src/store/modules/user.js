@@ -20,7 +20,8 @@ const user = {
     roles: [],
     setting: {
       articlePlatform: []
-    }
+    },
+    loginTime: ''
   },
 
   mutations: {
@@ -47,6 +48,9 @@ const user = {
     },
     SET_ROLES: (state, roles) => {
       state.roles = roles
+    },
+    SET_LOGINTIME: (state, loginTime) => {
+      state.loginTime = loginTime
     }
   },
   actions: {
@@ -88,6 +92,7 @@ const user = {
           commit('SET_NAME', data.name)
           commit('SET_AVATAR', data.avatar)
           commit('SET_INTRODUCTION', data.introduction)
+          commit('SET_LOGINTIME', data.loginTime)
           resolve(response)
         }).catch(error => {
           reject(error)

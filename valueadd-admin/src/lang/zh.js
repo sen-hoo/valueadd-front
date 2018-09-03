@@ -1,6 +1,9 @@
 export default {
   route: {
-    dashboard: '首页',
+    welcome: '首页',
+    dashboard: '分析统计',
+    spboard: '业务代码',
+    cpserviceboard: '合作方业务',
     introduction: '简述',
     documentation: '文档',
     guide: '引导页',

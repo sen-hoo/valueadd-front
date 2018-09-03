@@ -28,15 +28,15 @@ export const constantRouterMap = [{
   {
     path: '',
     component: Layout,
-    redirect: 'dashboard',
+    redirect: 'welcome',
     children: [{
-      path: 'dashboard',
+      path: 'welcome',
       component: () =>
-        import('@/views/dashboard/index'),
-      name: 'dashboard',
+        import('@/views/welcome/index'),
+      name: 'welcome',
       meta: {
-        title: 'dashboard',
-        icon: 'dashboard',
+        title: 'welcome',
+        icon: 'guide',
         noCache: true
       }
     }]
@@ -81,4 +81,36 @@ export const asyncRouterMap = [{
       }
     }
   ]
-}];
+},
+{
+  path: '',
+  component: Layout,
+  redirect: '/databoard/index',
+  meta: {
+    title: "dashboard",
+    icon: "dashboard",
+    noCache: true
+  },
+  children: [{
+    path: 'spcode/index',
+    component: () =>
+      import('@/views/databoard/spcode/index'),
+    name: 'spboard',
+    meta: {
+      title: 'spboard',
+      icon: 'chart',
+      noCache: true
+    }
+  },
+  {
+    path: "cpservice/index",
+    component: () =>
+      import("@/views/databoard/cpservice/index"),
+    name: "cpserviceboard",
+    meta: {
+      title: "cpserviceboard",
+      icon: 'table',
+      // if do not set roles, means: this page does not require permission
+    }
+  }]
+}]

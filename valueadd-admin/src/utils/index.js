@@ -71,7 +71,7 @@ export function parseTime(time, cFormat) {
   return time_str
 }
 
-export function formatTime(time, option) {
+export function formatTime(time, option) {//unix timestamp
   time = +time * 1000
   const d = new Date(time)
   const now = Date.now()
@@ -103,6 +103,10 @@ export function formatTime(time, option) {
       '分'
     )
   }
+}
+
+export function formatTimestamp(time) {
+  return formatTime(time/1000)
 }
 
 /**

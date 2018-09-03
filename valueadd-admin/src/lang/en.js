@@ -1,6 +1,9 @@
 export default {
   route: {
+    welcome: 'Index',
     dashboard: 'Dashboard',
+    spboard: 'Service Code',
+    cpserviceboard: 'Partner Service',
     introduction: 'Introduction',
     documentation: 'Documentation',
     guide: 'Guide',

@@ -4,10 +4,10 @@
       <pan-thumb style="float: left" :image="avatar"> Your roles:
         <span class="pan-info-roles" :key='item' v-for="item in roles">{{item}}</span>
       </pan-thumb>
-      <github-corner style="position: absolute; top: 0px; border: 0; right: 0;"></github-corner>
+      <!-- <github-corner style="position: absolute; top: 0px; border: 0; right: 0;"></github-corner> -->
       <div class="info-container">
-        <span class="display_name">{{name}}</span>
-        <span style="font-size:20px;padding-top:20px;display:inline-block;">Editor's Dashboard</span>
+        <span class="display_name">welecome-[{{name}}]</span>
+        <span style="font-size:20px;padding-top:20px;display:inline-block;">登陆时间:{{loginTime}}</span>
       </div>
     </div>
     <div>
@@ -25,6 +25,7 @@ export default {
   name: 'dashboard-editor',
   components: { PanThumb, GithubCorner },
   data() {
+    
     return {
       emptyGif: 'https://wpimg.wallstcn.com/0e03b7da-db9e-4819-ba10-9016ddfdaed3'
     }
@@ -33,7 +34,8 @@ export default {
     ...mapGetters([
       'name',
       'avatar',
-      'roles'
+      'roles',
+      'loginTime'
     ])
   }
 }
@@ -62,7 +64,7 @@ export default {
       height: 150px;
       line-height: 200px;
       .display_name {
-        font-size: 48px;
+        font-size: 36px;
         line-height: 48px;
         color: #212121;
         position: absolute;

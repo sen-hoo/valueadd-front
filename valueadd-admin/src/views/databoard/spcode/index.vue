@@ -1,19 +1,20 @@
 <template>
-    <div class="dashboard-editor-container">
-        <github-corner style="position: absolute; top: 0px; border: 0; right: 0;"></github-corner>
+    <div class="dashboard-container">
+        <div class="dashboard-editor-container">
+            <github-corner style="position: absolute; top: 0px; border: 0; right: 0;"></github-corner>
 
-        <panel-group @handleSetLineChartData="handleSetLineChartData"></panel-group>
-        <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
-            <line-chart :chart-data="lineChartData"></line-chart>
-        </el-row>
+            <panel-group @handleSetLineChartData="handleSetLineChartData"></panel-group>
+            <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+                <line-chart :chart-data="lineChartData"></line-chart>
+            </el-row>
+        </div>
     </div>
 </template>
 
 <script>
-import GithubCorner from '@/components/GithubCorner'
-import PanelGroup from './components/PanelGroup'
-import LineChart from './components/LineChart'
-
+import GithubCorner from "@/components/GithubCorner"
+import PanelGroup from "./components/PanelGroup"
+import LineChart from "./components/LineChart"
 const lineChartData = {
     newVisitis: {
         expectedData: [100, 120, 161, 134, 105, 160, 165],
@@ -34,7 +35,7 @@ const lineChartData = {
 }
 
 export default {
-    name: "dashboard-admin",
+    name: "dashboard-spcode",
     components: {
         GithubCorner,
         PanelGroup,
@@ -47,7 +48,7 @@ export default {
     },
     methods: {
         handleSetLineChartData(type) {
-            this.lineChartData = lineChartData[type]
+            this.lineChartData = lineChartData[type];
         }
     }
 }
