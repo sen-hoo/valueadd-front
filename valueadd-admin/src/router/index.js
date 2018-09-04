@@ -83,7 +83,7 @@ export const asyncRouterMap = [{
   ]
 },
 {
-  path: '',
+  path: '/databoard',
   component: Layout,
   redirect: '/databoard/index',
   meta: {
@@ -98,7 +98,7 @@ export const asyncRouterMap = [{
     name: 'spboard',
     meta: {
       title: 'spboard',
-      icon: 'chart',
+      //icon: 'chart',
       noCache: true
     }
   },
@@ -109,8 +109,196 @@ export const asyncRouterMap = [{
     name: "cpserviceboard",
     meta: {
       title: "cpserviceboard",
-      icon: 'table',
+      //icon: 'table',
       // if do not set roles, means: this page does not require permission
     }
   }]
-}]
+},
+//基础数据
+{
+  path: '/basedata',
+  component: Layout,
+  redirect: '/basedata/index',
+  meta: {
+    title: "basedata",
+    icon: "clipboard",
+    noCache: true
+  },
+  children: [{
+    path: 'blackuser/index',
+    component: () =>
+      import('@/views/basedata/blackuser/index'),
+    name: 'blackuser',
+    meta: {
+      title: 'blackuser',
+      //icon: 'chart',
+      noCache: true
+    }
+  },
+  {
+    path: "freeuser/index",
+    component: () =>
+      import("@/views/basedata/freeuser/index"),
+    name: "freeuser",
+    meta: {
+      title: "freeuser",
+      //icon: 'table',
+      // if do not set roles, means: this page does not require permission
+    }
+  }]
+},
+//网关路由
+{
+  path: '/sp',
+  component: Layout,
+  redirect: '/sp/index',
+  meta: {
+    title: "sp",
+    icon: "international",
+    noCache: true
+  },
+  children: [{//网关
+    path: 'gateway/index',
+    component: () =>
+      import('@/views/sp/gateway/index'),
+    name: 'gateway',
+    meta: {
+      title: 'gateway',
+      //icon: 'chart',
+      noCache: true
+    }
+  },
+  {//业务代码
+    path: "code/index",
+    component: () =>
+      import("@/views/sp/code/index"),
+    name: "serviceCode",
+    meta: {
+      title: "serviceCode",
+      //icon: 'table',
+      // if do not set roles, means: this page does not require permission
+    }
+  }]
+},
+//合作方
+{
+  path: '/partner',
+  component: Layout,
+  redirect: '/partner/index',
+  meta: {
+    title: "partner",
+    icon: "peoples",
+    noCache: true
+  },
+  children: [{//短信业务代码
+    path: 'smscode/index',
+    component: () =>
+      import('@/views/partner/smscode/index'),
+    name: 'smscode',
+    meta: {
+      title: 'smscode',
+      //icon: 'chart',
+      noCache: true
+    }
+  },
+  {//彩短信业务代码
+    path: 'mmscode/index',
+    component: () =>
+      import('@/views/partner/mmscode/index'),
+    name: 'mmscode',
+    meta: {
+      title: 'mmscode',
+      //icon: 'chart',
+      noCache: true
+    }
+  },
+  {//IVR业务代码
+    path: "code/index",
+    component: () =>
+      import("@/views/partner/ivrcode/index"),
+    name: "ivrcode",
+    meta: {
+      title: "ivrcode",
+      //icon: 'table',
+      // if do not set roles, means: this page does not require permission
+    }
+  },
+  {//联网业务代码
+    path: "netcode/index",
+    component: () =>
+      import("@/views/partner/netcode/index"),
+    name: "netcode",
+    meta: {
+      title: "netcode",
+      //icon: 'table',
+      // if do not set roles, means: this page does not require permission
+    }
+  }]
+},
+//账单路由
+{
+  path: '/bill',
+  component: Layout,
+  redirect: '/bill/index',
+  meta: {
+    title: "bill",
+    icon: "table",
+    noCache: true
+  },
+  children: [{//按网关代码维度路由
+    path: 'spcode/index',
+    component: () =>
+      import('@/views/bill/spcode/index'),
+    name: 'billSpCode',
+    meta: {
+      title: 'billSpCode',
+      //icon: 'chart',
+      noCache: true
+    }
+  },
+  {//按合作方维度路由
+    path: "cpcode/index",
+    component: () =>
+      import("@/views/bill/cpcode/index"),
+    name: "billCpCode",
+    meta: {
+      title: "billCpCode",
+      //icon: 'table',
+      // if do not set roles, means: this page does not require permission
+    }
+  }]
+},
+//搜索查询
+{
+  path: '/search',
+  component: Layout,
+  redirect: '/search/index',
+  meta: {
+    title: "search",
+    icon: "example",
+    noCache: true
+  },
+  children: [{//搜索订购记录
+    path: 'order/index',
+    component: () =>
+      import('@/views/search/order/index'),
+    name: 'searchOrder',
+    meta: {
+      title: 'searchOrder',
+      //icon: 'chart',
+      noCache: true
+    }
+  },
+  {//搜索同步日志
+    path: "synclog/index",
+    component: () =>
+      import("@/views/search/synclog/index"),
+    name: "synclog",
+    meta: {
+      title: "synclog",
+      //icon: 'table',
+      // if do not set roles, means: this page does not require permission
+    }
+  }]
+}
+]

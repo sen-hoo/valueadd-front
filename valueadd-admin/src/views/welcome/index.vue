@@ -7,7 +7,7 @@
       <!-- <github-corner style="position: absolute; top: 0px; border: 0; right: 0;"></github-corner> -->
       <div class="info-container">
         <span class="display_name">welecome-[{{name}}]</span>
-        <span style="font-size:20px;padding-top:20px;display:inline-block;">登陆时间:{{loginTime}}</span>
+        <span style="font-size:20px;padding-top:20px;display:inline-block;">登陆时间:{{formatLoginTime}}</span>
       </div>
     </div>
     <div>
@@ -20,6 +20,8 @@
 import { mapGetters } from 'vuex'
 import PanThumb from '@/components/PanThumb'
 import GithubCorner from '@/components/GithubCorner'
+import { formatTimestamp } from '@/utils'
+
 
 export default {
   name: 'dashboard-editor',
@@ -27,16 +29,18 @@ export default {
   data() {
     
     return {
-      emptyGif: 'https://wpimg.wallstcn.com/0e03b7da-db9e-4819-ba10-9016ddfdaed3'
+      emptyGif: 'https://wpimg.wallstcn.com/0e03b7da-db9e-4819-ba10-9016ddfdaed3',
+      formatLoginTime: formatTimestamp(this.$store.getters.loginTime)
     }
   },
   computed: {
-    ...mapGetters([
-      'name',
-      'avatar',
-      'roles',
-      'loginTime'
-    ])
+    ...mapGetters({name: 'name',
+      avatar: 'avatar',
+      roles: 'roles',
+      //loginTime: formatTimestamp('loginTime')
+      loginTime: 'loginTime'
+      }
+      )
   }
 }
 </script>
