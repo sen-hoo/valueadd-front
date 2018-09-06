@@ -1,9 +1,16 @@
 import axios from 'axios'
 
-import { Message, MessageBox } from 'element-ui'
+import {
+  Message,
+  MessageBox
+} from 'element-ui'
 import store from '@/store'
-import { getToken } from '@/utils/auth'
-import { ServerCodeEnum } from '@/common'
+import {
+  getToken
+} from '@/utils/auth'
+import {
+  ServerCodeEnum
+} from '@/common'
 
 const service = axios.create({
   baseURL: process.env.BASE_API, // api的base_url
@@ -68,33 +75,28 @@ service.interceptors.response.use(
     //   type: 'error',
     //   duration: 5 * 1000
     // })
-    if (res.code !== 0) {
-      if (res.code === ServerCodeEnum.Token_Expired){//token过期
-        MessageBox.confirm('登陆超时，请重新登陆', '提示', {
-          confirmButtonText: '重新登陆',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(()=>{
-          store.dispatch('FedLogOut').then(()=>{
-            location.reload() //为了重新实例化vue-router对象 避免bug
-          })
+    if (res.code === ServerCodeEnum.Token_Expired) { //token过期
+      MessageBox.confirm('登陆超时，请重新登陆', '提示', {
+        confirmButtonText: '重新登陆',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        store.dispatch('FedLogOut').then(() => {
+          location.reload() //为了重新实例化vue-router对象 避免bug
         })
-      } else if (res.code === ServerCodeEnum.Be_Logout) {//用户其他地方登陆
-        MessageBox.confirm('您已被登出，可以取消继续留在该页面，或者重新登录', '确定登出', {
-          confirmButtonText: '重新登陆',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(()=>{
-          store.dispatch('FedLogOut').then(()=>{
-            location.reload() //为了重新实例化vue-router对象 避免bug
-          })
+      })
+    } else if (res.code === ServerCodeEnum.Be_Logout) { //用户其他地方登陆
+      MessageBox.confirm('您已被登出，可以取消继续留在该页面，或者重新登录', '确定登出', {
+        confirmButtonText: '重新登陆',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        store.dispatch('FedLogOut').then(() => {
+          location.reload() //为了重新实例化vue-router对象 避免bug
         })
-      } else 
-        return Promise.reject(res.msg)
-    } else {
+      })
+    } else
       return response.data
-    }
-
   },
   error => {
     console.log('err' + error) // for debug

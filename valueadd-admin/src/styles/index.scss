@@ -179,6 +179,13 @@ div:focus{
       margin-bottom: 10px;
     }
   }
+
+  .operate-container {
+    padding-bottom: 10px;
+    .operate-item {
+      display: inline-block; 
+    }
+  }
   
   //refine vue-multiselect plugin
   .multiselect {
