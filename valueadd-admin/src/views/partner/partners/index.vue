@@ -1,63 +1,62 @@
 <template>
     <div class="app-container">
         <div class="filter-container">
-            <el-input v-model="listQuery.keyword" placeholder="关键字" class="filter-item" style="width: 300px;"></el-input>
+            <el-input v-model="listQuery.keyword" placeholder="合作方名称" class="filter-item" style="width: 300px;"></el-input>
             <el-button type="primary" icon="el-icon-search" class="filter-item" @click="searchByKeyword">搜索</el-button>
-            <el-button type="primary" @click="handleCreate" icon="el-icon-edit" class="filter-item">添加业务代码</el-button>
+            <el-button type="primary" @click="handleCreate" icon="el-icon-edit" class="filter-item">添加合作方</el-button>
         </div>
         <div class="table-container">
             <el-table :data="dataList" v-loading="listLoading" stripe highlight-current-row>
                 <el-table-column align="center" label="PKID" width="65">
                     <template slot-scope="scope">
-                        <span>{{scope.row.codePk}}</span>
+                        <span>{{scope.row.rowId}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column align="center" label="业务ID">
+                <el-table-column align="center" label="编号">
                     <template slot-scope="scope">
-                        <span>{{scope.row.codeId}}</span>
+                        <span>{{scope.row.cpId}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column align="center" label="代码ID">
+                <el-table-column align="center" label="名称">
                     <template slot-scope="scope">
-                        <span>{{scope.row.productId}}</span>
+                        <span>{{scope.row.cpName}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column align="center" label="业务名称">
+                <el-table-column align="center" label="公司名称">
                     <template slot-scope="scope">
-                        <span>{{scope.row.codeName}}</span>
+                        <span>{{scope.row.cpCompany}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column align="center" label="网关名称">
+                <el-table-column align="center" label="电话">
                     <template slot-scope="scope">
-                        <span>{{scope.row.gatewayName}}</span>
+                        <span>{{scope.row.cpMobile}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column align="center" label="业务类型">
+                <!-- <el-table-column align="center" label="电邮">
                     <template slot-scope="scope">
-                        <span>{{scope.row.codeType}}</span>
+                        <span>{{scope.row.cpEmail}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column align="center" label="计费类型">
+                <el-table-column align="center" label="银行账号">
                     <template slot-scope="scope">
-                        <span>{{scope.row.feeType}}</span>
+                        <span>{{scope.row.bankAccount}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column align="center" label="价格">
+                <el-table-column align="center" label="姓名">
                     <template slot-scope="scope">
-                        <span>{{scope.row.feeValue}}</span>
+                        <span>{{scope.row.bankUser}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column align="center" label="描述">
+                <el-table-column align="center" label="开户行地址">
                     <template slot-scope="scope">
-                        <span>{{scope.row.description}}</span>
+                        <span>{{scope.row.bankAddress}}</span>
                     </template>
-                </el-table-column>
-                
-                <el-table-column align="center" label="操作" class-name="mini-padding">
+                </el-table-column> -->
+                <el-table-column align="center" label="操作" class-name="small-padding">
                     <template slot-scope="scope">
                         <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteOperation(scope.row)"></el-button>
-                        <el-button size="mini" type="primary" icon="el-icon-edit" @click="editOperation(scope.row)"></el-button>
-                        <el-button size="mini" type="primary" icon="el-icon-share" @click="businessOperation(scope.row)">业务代码</el-button>
+                        <el-button size="mini" type="primary" icon="el-icon-edit"  @click="editOperation(scope.row)"></el-button>
+                        <el-button size="mini" type="primary" icon="el-icon-share"  @click="businessOperation(scope.row)">合作方业务</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -66,64 +65,61 @@
                 </el-pagination>
             </div>
         </div>
-        <el-dialog title="添加网关" :visible.sync="dialogFormVisible">
-            <el-form :model="temp" :rules="rules" ref="addServiceCodeForm" label-position="left" label-width="100px">
-                <el-form-item label="网关名称" prop="name">
-                    <el-input v-model="temp.name" placeholder="网关名称" style="width:200px;"></el-input>
+        <el-dialog title="添加合作方" :visible.sync="dialogFormVisible">
+            <el-form :model="temp" :rules="rules" ref="addPartnerForm" label-position="left" label-width="100px">
+                <el-form-item label="合作方ID" prop="cpId">
+                    <el-input v-model="temp.cpId" placeholder="合作方ID" style="width:180px;"></el-input>
                 </el-form-item>
-                <el-form-item label="端口" prop="port">
-                    <el-input v-model="temp.port" placeholder="端口号" style="width:100px;"></el-input>
+                <el-form-item label="合作方名称" prop="cpName">
+                    <el-input v-model="temp.cpName" placeholder="合作方名称" style="width:300px;"></el-input>
                 </el-form-item>
-                <el-form-item label="长号码" prop="longTermid">
-                    <el-input v-model="temp.longTermid" placeholder="长号码" style="width:300px;"></el-input>
+                <el-form-item label="公司名称" prop="cpCompany">
+                    <el-input v-model="temp.cpCompany" placeholder="公司名称" style="width:300px;"></el-input>
                 </el-form-item>
-                <el-form-item label="密钥" prop="password">
-                    <el-input v-model="temp.password" placeholder="网关密钥" style="width:300px;"></el-input>
+                <el-form-item label="联系电话" prop="cpMobile">
+                    <el-input v-model="temp.cpMobile" placeholder="联系电话" style="width:200px;"></el-input>
                 </el-form-item>
-                <el-form-item label="短信地址" prop="smsUrl">
-                    <el-input v-model="temp.smsUrl" placeholder="短信地址"></el-input>
+                <el-form-item label="电子邮箱" prop="cpEmail">
+                    <el-input v-model="temp.cpEmail" placeholder="电子邮箱" style="width:300px;"></el-input>
                 </el-form-item>
-                <el-form-item label="彩信地址" prop="mmsUrl">
-                    <el-input v-model="temp.mmsUrl" placeholder="彩信地址"></el-input>
+                <el-form-item label="收款账号" prop="bankAccount">
+                    <el-input v-model="temp.bankAccount" placeholder="汇款账号" style="width:300px;"></el-input>
                 </el-form-item>
-                <el-form-item label="IVR地址" prop="ivrUrl">
-                    <el-input v-model="temp.ivrUrl" placeholder="IVR地址"></el-input>
+                <el-form-item label="收款人姓名" prop="bankUser">
+                    <el-input v-model="temp.bankUser" placeholder="收款人姓名" style="width:180px;"></el-input>
                 </el-form-item>
-                <el-form-item label="联网地址" prop="netUrl">
-                    <el-input v-model="temp.netUrl" placeholder="联网地址"></el-input>
+                <el-form-item label="开户行地址" prop="bankAddress">
+                    <el-input v-model="temp.bankAddress" placeholder="开户行地址" style="max-width:400px;"></el-input>
                 </el-form-item>
-                <el-form-item label="回调地址" prop="callbackUrl">
-                    <el-input v-model="temp.callbackUrl" placeholder="回调地址"></el-input>
+                <el-form-item label="IP列表" prop="cpIpList">
+                    <el-input type="textarea" :rows="3" v-model="temp.cpIpList" placeholder="IP列表（多条请,分割）" style="width:500px;"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="dialogFormVisible = false">取消</el-button>
-                <el-button type="primary" @click="submitForm('addServiceCodeForm')">确定</el-button>
+                <el-button type="primary" @click="submitForm('addPartnerForm')">确定</el-button>
             </div>
+
         </el-dialog>
     </div>
 </template>
 <script>
 import { Message } from "element-ui";
-import {
-    fetchServiceCodeList,
-    addServiceCode,
-    editServiceCode,
-    deleteServiceCode
-} from "@/api/serviceCode";
+import { fetchPartnerList, addPartner, editPartner, deletePartner } from "@/api/partner"
 export default {
     data() {
         return {
             temp: {
-                codePk: undefined,
-                codeId: undefined,
-                productId: undefined,
-                codeName: undefined,
-                gatwayId: undefined,
-                gatewayPort: undefined,
-                codeType: undefined,
-                feeType: undefined,
-                feeValue: undefined
+                rowId: undefined,
+                cpId: undefined,
+                cpName: undefined,
+                cpCompany: undefined,
+                cpMobile: undefined,
+                cpEmail: undefined,
+                bankAccount: undefined,
+                bankUser: undefined,
+                bankAddress: undefined,
+                cpIpList: undefined
             },
             dialogFormVisible: false,
             detailFormVisible: false,
@@ -136,52 +132,29 @@ export default {
                 pageNumber: 1
             },
             rules: {
-                name: [
-                    {
-                        required: true,
-                        message: "网关名称",
-                        trigger: "blur"
-                    }
+                cpId: [
+                    { required: true, message: "合作方ID为必需字段", trigger: "blur" }
                 ],
-                longTermid: [
-                    {
-                        required: true,
-                        message: "请输入长号码",
-                        trigger: "blur"
-                    }
-
-                ],
-                port: [
-                    {
-                        required: true,
-                        message: "请输入网关端口",
-                        trigger: "blur"
-                    }
-                ],
-                state: [
-                    {
-                        required: true,
-                        message: "请选择网关状态",
-                        trigger: "blur"
-                    }
+                cpName: [
+                    { required: true, message: "请输入合作方名称", trigger: "blur" }
                 ]
             }
-        };
+        }
     },
     created() {
-        this.fetchList();
+        this.fetchList()
     },
     methods: {
         fetchList() {
-            this.listLoading = true;
+            this.listLoading = true
             if (this.listQuery.keyword === "") this.listQuery.keyword = undefined;
-            fetchGatewaylist(this.listQuery).then(res => {
+            fetchPartnerList(this.listQuery).then((res)=> {
                 setTimeout(() => {
                     this.listLoading = false;
                 }, 1.5 * 1000);
                 if (res.code === 0) {
-                    (this.dataList = res.data.serviceCodeList),
-                        (this.total = res.data.page.total);
+                    (this.dataList = res.data.partnerList),
+                    (this.total = res.data.page.total);
                 } else {
                     Message({
                         message: res.data.msg,
@@ -190,7 +163,7 @@ export default {
                     });
                     this.listLoading = false;
                 }
-            });
+            })
         },
         searchByKeyword() {
             this.fetchList();
@@ -203,23 +176,23 @@ export default {
             this.listQuery.pageSize = pageSize;
             this.fetchList();
         },
-        resetTemp() {
-            //重置实体类
+        resetTemp() {//重置实体类
             this.temp = {
-                codePk: undefined,
-                codeId: undefined,
-                productId: undefined,
-                codeName: undefined,
-                gatwayId: undefined,
-                gatewayPort: undefined,
-                codeType: undefined,
-                feeType: undefined,
-                feeValue: undefined
+                rowId: undefined,
+                cpId: undefined,
+                cpName: undefined,
+                cpCompany: undefined,
+                cpMobile: undefined,
+                cpEmail: undefined,
+                bankAccount: undefined,
+                bankUser: undefined,
+                bankAddress: undefined,
+                cpIpList: undefined
             };
         },
         deleteOperation(row) {
-            let params = { pkId: row.gatewayId };
-            deletePartner(params).then(res => {
+            let params = { pkId: row.rowId };
+            deletePartner(params).then((res)=>{
                 if (res.code === 0) {
                     this.$notify({
                         title: "成功",
@@ -235,46 +208,44 @@ export default {
                         duration: 2000
                     });
                 }
-            });
+            })
         },
-        editOperation(row) {
-            //编辑合作方
+        editOperation(row) {//编辑合作方
             this.temp = {
-                codePk: row.codePk,
-                codeId: row.codeId,
-                productId: row.productId,
-                codeName: row.codeName,
-                gatwayId: row.gatwayId,
-                gatewayPort: row.gatewayPort,
-                codeType: row.codeType,
-                feeType: row.feeType,
-                feeValue: row.feeValue
+                rowId: row.rowId,
+                cpId: row.cpId,
+                cpName: row.cpName,
+                cpCompany: row.cpCompany,
+                cpMobile: row.cpMobile,
+                cpEmail: row.cpEmail,
+                bankAccount: row.bankAccount,
+                bankUser: row.bankUser,
+                bankAddress: row.bankAddress,
+                cpIpList: row.cpIpList
             };
             this.dialogStatus = "create";
             this.dialogFormVisible = true;
             this.$nextTick(() => {
-                this.$refs["addServiceCodeForm"].clearValidate();
+                this.$refs["addPartnerForm"].clearValidate();
             });
         },
-        businessOperation(row) {
-            //跳转到业务管理标签页
+        businessOperation(row) {//跳转到业务管理标签页
+
         },
-        handleCreate() {
-            //显示添加合作方窗口
+        handleCreate() {//显示添加合作方窗口
             //添加
             this.resetTemp();
             this.dialogStatus = "create";
             this.dialogFormVisible = true;
             this.$nextTick(() => {
-                this.$refs["addServiceCodeForm"].clearValidate();
+                this.$refs["addPartnerForm"].clearValidate();
             });
         },
-        submitForm(formName) {
-            //点击确定按钮
+        submitForm(formName) {//点击确定按钮
             this.$refs[formName].validate(valid => {
                 if (valid) {
                     if (this.temp.rowId == null) {
-                        addServiceCode(this.temp).then(res => {
+                        addPartner(this.temp).then(res => {
                             if (res.code === 0) {
                                 this.dialogFormVisible = false;
                                 this.dataList.unshift(this.temp);
@@ -295,7 +266,7 @@ export default {
                             }
                         });
                     } else {
-                        editServiceCode(this.temp).then(res => {
+                        editPartner(this.temp).then((res)=> {
                             if (res.code === 0) {
                                 this.dialogFormVisible = false;
                                 this.dataList.unshift(this.temp);
@@ -314,11 +285,13 @@ export default {
                                     duration: 2000
                                 });
                             }
-                        });
+                        })
                     }
                 }
             });
         }
+
     }
-};
+}
 </script>
+

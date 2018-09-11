@@ -162,7 +162,7 @@ export default {
                     this.$notify({
                         title: "失败",
                         message: "删除失败",
-                        type: "failed",
+                        type: "error",
                         duration: 2000
                     });
                 }
@@ -187,7 +187,7 @@ export default {
                             this.$notify({
                                 title: "失败",
                                 message: "添加失败",
-                                type: "failed",
+                                type: "error",
                                 duration: 2000
                             });
                         }

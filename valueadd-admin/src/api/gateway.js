@@ -18,7 +18,7 @@ export function deleteGateway(pkId) {
 // 添加网关信息
 export function addGateway(gateway) {
   return request({
-    url: '/gateway/delete',
+    url: '/gateway/add',
     method: 'post',
     params: gateway
   })

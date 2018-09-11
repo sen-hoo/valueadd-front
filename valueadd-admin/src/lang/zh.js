@@ -11,6 +11,8 @@ export default {
     gateway: '网关管理',
     serviceCode: '业务代码管理',
     partner: '合作方管理',
+    partners: '合作方',
+    business: '业务管理',
     smscode: '短信业务',
     mmscode: '彩信业务',
     ivrcode: 'IVR业务',

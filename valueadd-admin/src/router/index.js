@@ -6,6 +6,8 @@ Vue.use(Router);
 
 /* Layout */
 import Layout from "@/views/layout/Layout";
+/* Router Modules */
+import partnerRouter from './modules/partner'
 
 export const constantRouterMap = [{
     path: "/login",
@@ -181,60 +183,7 @@ export const asyncRouterMap = [{
   }]
 },
 //合作方
-{
-  path: '/partner',
-  component: Layout,
-  redirect: '/partner/index',
-  meta: {
-    title: "partner",
-    icon: "peoples",
-    noCache: true
-  },
-  children: [{//短信业务代码
-    path: 'smscode/index',
-    component: () =>
-      import('@/views/partner/smscode/index'),
-    name: 'smscode',
-    meta: {
-      title: 'smscode',
-      //icon: 'chart',
-      noCache: true
-    }
-  },
-  {//彩短信业务代码
-    path: 'mmscode/index',
-    component: () =>
-      import('@/views/partner/mmscode/index'),
-    name: 'mmscode',
-    meta: {
-      title: 'mmscode',
-      //icon: 'chart',
-      noCache: true
-    }
-  },
-  {//IVR业务代码
-    path: "code/index",
-    component: () =>
-      import("@/views/partner/ivrcode/index"),
-    name: "ivrcode",
-    meta: {
-      title: "ivrcode",
-      //icon: 'table',
-      // if do not set roles, means: this page does not require permission
-    }
-  },
-  {//联网业务代码
-    path: "netcode/index",
-    component: () =>
-      import("@/views/partner/netcode/index"),
-    name: "netcode",
-    meta: {
-      title: "netcode",
-      //icon: 'table',
-      // if do not set roles, means: this page does not require permission
-    }
-  }]
-},
+partnerRouter,
 //账单路由
 {
   path: '/bill',
