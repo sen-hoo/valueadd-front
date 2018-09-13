@@ -66,34 +66,39 @@
                 </el-pagination>
             </div>
         </div>
-        <el-dialog title="添加网关" :visible.sync="dialogFormVisible">
+        <el-dialog title="添加业务代码" :visible.sync="dialogFormVisible">
             <el-form :model="temp" :rules="rules" ref="addServiceCodeForm" label-position="left" label-width="100px">
-                <el-form-item label="网关名称" prop="name">
-                    <el-input v-model="temp.name" placeholder="网关名称" style="width:200px;"></el-input>
+                <el-form-item label="网关" prop="gatwayId">
+                    <el-select v-model="temp.gatwayId" placeholder="请选择">
+                        <el-option v-for="item in gatewayList" :key="item.gatewayId" :label="item.name" :value="item.gatewayId">
+                        </el-option>
+                    </el-select>
                 </el-form-item>
-                <el-form-item label="端口" prop="port">
-                    <el-input v-model="temp.port" placeholder="端口号" style="width:100px;"></el-input>
+                <el-form-item label="业务代码" prop="codeId">
+                    <el-input v-model="temp.codeId" placeholder="业务代码" style="width:100px;"></el-input>
                 </el-form-item>
-                <el-form-item label="长号码" prop="longTermid">
-                    <el-input v-model="temp.longTermid" placeholder="长号码" style="width:300px;"></el-input>
+                <el-form-item label="物料ID" prop="productId">
+                    <el-input v-model="temp.productId" placeholder="物料ID" style="width:100px;"></el-input>
                 </el-form-item>
-                <el-form-item label="密钥" prop="password">
-                    <el-input v-model="temp.password" placeholder="网关密钥" style="width:300px;"></el-input>
+                <el-form-item label="代码类型" prop="codeType">
+                    <el-select v-model="temp.codeType" placeholder="请选择">
+                        <el-option v-for="item in codeTypeOptions" :key="item.type" :label="item.label" :value="item.type">
+                        </el-option>
+                    </el-select>
                 </el-form-item>
-                <el-form-item label="短信地址" prop="smsUrl">
-                    <el-input v-model="temp.smsUrl" placeholder="短信地址"></el-input>
+                <el-form-item label="计费类型" prop="feeType">
+                    <el-radio-group v-model="temp.feeType">
+                        <el-radio :label="1">按条</el-radio>
+                        <el-radio :label="2">包月</el-radio>
+                        <el-radio :label="3">按分钟</el-radio>
+                        <el-radio :label="9">免费</el-radio>
+                    </el-radio-group>
                 </el-form-item>
-                <el-form-item label="彩信地址" prop="mmsUrl">
-                    <el-input v-model="temp.mmsUrl" placeholder="彩信地址"></el-input>
+                <el-form-item label="费率" prop="feeValue">
+                    <el-input v-model="temp.feeValue" placeholder="费率" style="width:100px;"></el-input>
                 </el-form-item>
-                <el-form-item label="IVR地址" prop="ivrUrl">
-                    <el-input v-model="temp.ivrUrl" placeholder="IVR地址"></el-input>
-                </el-form-item>
-                <el-form-item label="联网地址" prop="netUrl">
-                    <el-input v-model="temp.netUrl" placeholder="联网地址"></el-input>
-                </el-form-item>
-                <el-form-item label="回调地址" prop="callbackUrl">
-                    <el-input v-model="temp.callbackUrl" placeholder="回调地址"></el-input>
+                <el-form-item label="描述" prop="description">
+                    <el-input type="textarea" :rows="3" v-model="temp.description" placeholder="描述"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -138,10 +143,11 @@
 </template>
 <script>
 import { Message } from "element-ui";
+import { fetchGatewayClause } from "@/api/gateway";
 import { fetchServiceCodeList, addServiceCode, editServiceCode, deleteServiceCode } from "@/api/serviceCode";
 import { editSCodeCtrl, fetchSCodeCtrlList } from "@/api/serviceCodeCtrl";
 import { fetchServiceCodeRouteList, addServiceCodeRoute, deleteServiceCodeRoute, editServiceCodeRoute} from "@/api/serviceCodeRoute"
-import { RouteTypeOptionsEnum } from "@/common"
+import { RouteTypeOptionsEnum, ServiceCodeEnum } from "@/common"
 export default {
     data() {
         return {
@@ -153,8 +159,9 @@ export default {
                 gatwayId: undefined,
                 gatewayPort: undefined,
                 codeType: undefined,
-                feeType: undefined,
-                feeValue: undefined
+                feeType: 1,
+                feeValue: undefined,
+                description: undefined
             },
             routeTemp: {
                 codeRouteId: undefined,
@@ -167,8 +174,10 @@ export default {
                 type: undefined
             },
             routeTypeOptions: RouteTypeOptionsEnum,
+            codeTypeOptions: ServiceCodeEnum,
             dialogFormVisible: false,
             routeDialogFormVisible: false,
+            gatewayList: null,
             listLoading: true,
             dataList: null,
             total: null,
@@ -214,6 +223,13 @@ export default {
         this.fetchList();
     },
     methods: {
+        fetchGateway() {
+            fetchGatewayClause({}).then(res => {
+                if (res.code === 0) {
+                    (this.gatewayList = res.data.gatewayList)
+                }
+            })
+        },
         fetchList() {
             this.listLoading = true;
             if (this.listQuery.keyword === "") this.listQuery.keyword = undefined;
@@ -255,9 +271,10 @@ export default {
                 gatwayId: undefined,
                 gatewayPort: undefined,
                 codeType: undefined,
-                feeType: undefined,
+                feeType: 1,
                 feeValue: undefined
             };
+            this.gatewayList = null
         },
         deleteOperation(row) {
             let params = { pkId: row.gatewayId };
@@ -302,9 +319,10 @@ export default {
             //跳转到业务管理标签页
         },
         handleCreate() {
-            //显示添加合作方窗口
+            //显示添加业务代码窗口
             //添加
             this.resetTemp();
+            this.fetchGateway();
             this.dialogStatus = "create";
             this.dialogFormVisible = true;
             this.$nextTick(() => {

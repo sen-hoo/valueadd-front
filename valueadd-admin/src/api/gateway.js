@@ -31,3 +31,12 @@ export function editGateway(gateway) {
         params: gateway
     })
 }
+//条件查询
+export function fetchGatewayClause(clause) {
+    return request({
+      url: '/gateway/clause',
+      method:'get',
+      params: clause
+    })
+}
+
