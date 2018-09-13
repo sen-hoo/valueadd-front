@@ -14,3 +14,5 @@ export const ServiceCodeEnum = {
     Net_Type_Value: 4,
     Net_Type_Desc: '联网'
 }
+/**路由匹配类型 */
+export const RouteTypeOptionsEnum = [{type: 1, label: '精确'}, {type: 2, label: '模糊'}, { type: 3, label:'正则'}]

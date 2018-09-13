@@ -57,7 +57,7 @@
                     <template slot-scope="scope">
                         <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteOperation(scope.row)"></el-button>
                         <el-button size="mini" type="primary" icon="el-icon-edit" @click="editOperation(scope.row)"></el-button>
-                        <el-button size="mini" type="primary" icon="el-icon-share" @click="businessOperation(scope.row)">业务代码</el-button>
+                        <el-button size="mini" type="primary" icon="el-icon-share" @click="businessOperation(scope.row)">添加指令</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -101,16 +101,47 @@
                 <el-button type="primary" @click="submitForm('addServiceCodeForm')">确定</el-button>
             </div>
         </el-dialog>
+        <el-dialog title="添加指令">
+            <el-form :model="routeTemp" :rules="routeRules" ref="addServiceCodeRouteForm" label-position="left" label-width="100px">
+                <el-form-item label="业务代码" prop="serviceCodeId">
+                    <el-input v-model="routeTemp.serviceCodeId" placeholder="长号码" style="width:300px;"></el-input>
+                </el-form-item>
+                <el-form-item label="指令" prop="orderCode">
+                    <el-input v-model="routeTemp.orderCode" placeholder="订购指令" style="width:300px;"></el-input>
+                </el-form-item>
+                <el-form-item label="指令匹配" prop="orderCodeCheckFlag">
+                    <el-select v-model="routeTemp.orderCodeCheckFlag" placeholder="请选择">
+                        <el-option v-for="item in routeTypeOptions" :key="item.type" :label="item.label" :value="item.type">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="目的号码" prop="orderDest">
+                    <el-input v-model="routeTemp.orderDest" placeholder="目的号码"></el-input>
+                </el-form-item>
+                <el-form-item label="目的号码匹配" prop="orderDestCheckFlag">
+                    <el-select v-model="routeTemp.orderDestCheckFlag" placeholder="请选择">
+                        <el-option v-for="item in routeTypeOptions" :key="item.type" :label="item.label" :value="item.type">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="类型" prop="type">
+                    <el-input v-model="routeTemp.type" placeholder="类型"></el-input>
+                </el-form-item>
+                
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="routeDialogFormVisible = false">取消</el-button>
+                <el-button type="primary" @click="submitForm('addServiceCodeRouteForm')">确定</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 <script>
 import { Message } from "element-ui";
-import {
-    fetchServiceCodeList,
-    addServiceCode,
-    editServiceCode,
-    deleteServiceCode
-} from "@/api/serviceCode";
+import { fetchServiceCodeList, addServiceCode, editServiceCode, deleteServiceCode } from "@/api/serviceCode";
+import { editSCodeCtrl, fetchSCodeCtrlList } from "@/api/serviceCodeCtrl";
+import { fetchServiceCodeRouteList, addServiceCodeRoute, deleteServiceCodeRoute, editServiceCodeRoute} from "@/api/serviceCodeRoute"
+import { RouteTypeOptionsEnum } from "@/common"
 export default {
     data() {
         return {
@@ -125,8 +156,19 @@ export default {
                 feeType: undefined,
                 feeValue: undefined
             },
+            routeTemp: {
+                codeRouteId: undefined,
+                serviceCodePkid: undefined,
+                serviceCodeId: undefined,
+                orderCode: undefined,
+                orderCodeCheckFlag: undefined,
+                orderDest: undefined,
+                orderDestCheckFlag: undefined,
+                type: undefined
+            },
+            routeTypeOptions: RouteTypeOptionsEnum,
             dialogFormVisible: false,
-            detailFormVisible: false,
+            routeDialogFormVisible: false,
             listLoading: true,
             dataList: null,
             total: null,
@@ -175,7 +217,7 @@ export default {
         fetchList() {
             this.listLoading = true;
             if (this.listQuery.keyword === "") this.listQuery.keyword = undefined;
-            fetchGatewaylist(this.listQuery).then(res => {
+            fetchServiceCodeList(this.listQuery).then(res => {
                 setTimeout(() => {
                     this.listLoading = false;
                 }, 1.5 * 1000);
