@@ -27,7 +27,7 @@ export function deleteServiceCodeRoute(pkId) {
 /** 修改 */
 export function editServiceCodeRoute(serviceCodeRoute) {
     return request({
-        url: '/serviceCodeRoute/update',
+        url: '/serviceCodeRoute/edit',
         method: 'post',
         params: serviceCodeRoute
     })

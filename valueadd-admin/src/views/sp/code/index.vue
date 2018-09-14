@@ -11,17 +11,34 @@
                      <template slot-scope="scope">
                          <table cellspacing="0" cellpadding="0" border="0" class="el-table__body" style="width:100%;background:#F2F6FC;">
                              <tr v-for="item in scope.row.serviceCodeRouteList">
-                                 <td class="cell"><span>{{item.orderCodeCheckFlag}}</span></td>
-                                 <td class="cell"><span>{{item.orderCode}}</span></td>
-                                 <td class="cell"><span>{{item.orderDest}}</span></td>
-                                 <td class="cell"><span>{{item.type}}</span></td>
+                                 <td class="cell">
+                                     <span v-if="item.orderCodeCheckFlag === 1">{{item.orderCode}}（精确）</span>
+                                     <span v-else-if="item.orderCodeCheckFlag === 2">{{item.orderCode}}（模糊）</span>
+                                     <span v-else-if="item.orderCodeCheckFlag === 3">{{item.orderCode}}（正则）</span>
+                                </td>
+                                 <td class="cell">
+                                     <span v-if="item.orderDestCheckFlag === 1">{{item.orderDest}}（精确）</span>
+                                     <span v-else-if="item.orderDestCheckFlag === 2">{{item.orderDest}}（模糊）</span>
+                                     <span v-else-if="item.orderDestCheckFlag === 3">{{item.orderDest}}（正则）</span>
+                                </td>
+                                 <td class="cell">
+                                     <span v-if="item.type === 1">点播</span>
+                                     <span v-else-if="item.type === 2">定制</span>
+                                     <span v-else-if="item.type === 3">取消定制</span>
+                                     <span v-else-if="item.type === 4">普通上行</span>
+                                 </td>
+                                 <td>
+                                    <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteSCodeRoute(item.codeRouteId)"></el-button>
+                                    <el-button size="mini" type="primary" icon="el-icon-edit" @click="editSCodeRoute(item)"></el-button>
+                                 </td>
                              </tr>
                          </table>
-                         <!-- <span>{{scope.row.serviceCodeRouteList[0].orderCodeCheckFlag}}</span>
-                         <span>{{scope.row.serviceCodeRouteList[0].orderCode}}</span>
-                         <span>{{scope.row.serviceCodeRouteList[0].orderDest}}</span>
-                         <span>{{scope.row.serviceCodeRouteList[0].type}}</span> -->
                      </template>
+                </el-table-column>
+                <el-table-column align="center" label="业务名称">
+                    <template slot-scope="scope">
+                        <span>{{scope.row.codeName}}</span>
+                    </template>
                 </el-table-column>
                 <el-table-column align="center" label="业务ID">
                     <template slot-scope="scope">
@@ -31,11 +48,6 @@
                 <el-table-column align="center" label="代码ID">
                     <template slot-scope="scope">
                         <span>{{scope.row.productId}}</span>
-                    </template>
-                </el-table-column>
-                <el-table-column align="center" label="业务名称">
-                    <template slot-scope="scope">
-                        <span>{{scope.row.codeName}}</span>
                     </template>
                 </el-table-column>
                 <el-table-column align="center" label="网关名称">
@@ -59,7 +71,7 @@
                         <span v-else-if="scope.row.feeType === 9">免费</span>
                     </template>
                 </el-table-column>
-                <el-table-column align="center" label="价格">
+                <el-table-column align="center" label="价格(分)">
                     <template slot-scope="scope">
                         <span>{{scope.row.feeValue}}</span>
                     </template>
@@ -276,8 +288,7 @@ export default {
                     this.listLoading = false;
                 }, 1.5 * 1000);
                 if (res.code === 0) {
-                    console.log(JSON.stringify(res.data.serviceCodeList))
-                    (this.dataList = res.data.serviceCodeList),
+                    (this.dataList = res.data.serviceCodeList);
                         (this.total = res.data.page.total);
                 } else {
                     Message({
@@ -384,7 +395,6 @@ export default {
             this.$refs[formName].validate(valid => {
                 if (valid) {
                     if (formName === 'addServiceCodeForm') {
-                        console.log(JSON.stringify(this.temp))
                         if (this.temp.codePk == null) {
                             addServiceCode(this.temp).then(res => {
                                 if (res.code === 0) {
@@ -430,10 +440,10 @@ export default {
                         }
                     }
                     if (formName === 'addServiceCodeRouteForm') {
-                        if (this.routeTemp.codePk == null) {
+                        if (this.routeTemp.codeRouteId == null) {
                             addServiceCodeRoute(this.routeTemp).then(res => {
                                 if (res.code === 0) {
-                                    this.dialogFormVisible = false;
+                                    this.routeDialogFormVisible = false;
                                     this.dataList.unshift(this.temp);
                                     this.$notify({ title: "成功", message: "创建成功", type: "success", duration: 2000 });
                                     this.fetchList();
@@ -444,7 +454,7 @@ export default {
                         } else {
                             editServiceCodeRoute(this.routeTemp).then(res => {
                                 if (res.code === 0) {
-                                    this.dialogFormVisible = false;
+                                    this.routeDialogFormVisible = false;
                                     this.dataList.unshift(this.routeTemp);
                                     this.$notify({ title: "成功", message: "修改成功", type: "success", duration: 2000 });
                                     this.fetchList();
@@ -476,6 +486,32 @@ export default {
         otherCommand(row, command) {
             console.log(JSON.stringify(row))
             console.log(JSON.stringify(command))
+        },
+        editSCodeRoute(row) {
+            //编辑合作方
+            this.routeTemp = {
+                codeRouteId: row.codeRouteId,
+                serviceCodeId: row.serviceCodeId,
+                orderCode: row.orderCode,
+                orderCodeCheckFlag: row.orderCodeCheckFlag,
+                orderDest: row.orderDest,
+                orderDestCheckFlag: row.orderDestCheckFlag,
+                type: row.type
+            };
+            this.dialogStatus = "create";
+            this.routeDialogFormVisible = true;
+            this.$nextTick(() => {
+                this.$refs["addServiceCodeRouteForm"].clearValidate();
+            });
+        },
+        deleteSCodeRoute(pkId) {
+            deleteServiceCodeRoute(pkId).then((res)=> {
+                if (res.code === 0) {
+                    this.$notify({ title: "成功", message: "删除成功", type: "success",duration: 2000 });
+                } else {
+                    this.$notify({ title: "失败", message: "删除失败", type: "error", duration: 2000 });
+                }
+            })
         }
     }
 };
