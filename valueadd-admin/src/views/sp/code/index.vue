@@ -7,10 +7,21 @@
         </div>
         <div class="table-container">
             <el-table :data="dataList" v-loading="listLoading" stripe highlight-current-row>
-                <el-table-column align="center" label="PKID" width="65">
-                    <template slot-scope="scope">
-                        <span>{{scope.row.codePk}}</span>
-                    </template>
+                <el-table-column align="center" label="PKID" width="65"  type="expand">
+                     <template slot-scope="scope">
+                         <table cellspacing="0" cellpadding="0" border="0" class="el-table__body" style="width:100%;background:#F2F6FC;">
+                             <tr v-for="item in scope.row.serviceCodeRouteList">
+                                 <td class="cell"><span>{{item.orderCodeCheckFlag}}</span></td>
+                                 <td class="cell"><span>{{item.orderCode}}</span></td>
+                                 <td class="cell"><span>{{item.orderDest}}</span></td>
+                                 <td class="cell"><span>{{item.type}}</span></td>
+                             </tr>
+                         </table>
+                         <!-- <span>{{scope.row.serviceCodeRouteList[0].orderCodeCheckFlag}}</span>
+                         <span>{{scope.row.serviceCodeRouteList[0].orderCode}}</span>
+                         <span>{{scope.row.serviceCodeRouteList[0].orderDest}}</span>
+                         <span>{{scope.row.serviceCodeRouteList[0].type}}</span> -->
+                     </template>
                 </el-table-column>
                 <el-table-column align="center" label="业务ID">
                     <template slot-scope="scope">
@@ -34,12 +45,18 @@
                 </el-table-column>
                 <el-table-column align="center" label="业务类型">
                     <template slot-scope="scope">
-                        <span>{{scope.row.codeType}}</span>
+                        <span v-if="scope.row.codeType === 1">短信</span>
+                        <span v-else-if="scope.row.codeType === 2">彩信</span>
+                        <span v-else-if="scope.row.codeType === 3">IVR</span>
+                        <span v-else-if="scope.row.codeType === 4">联网</span>
                     </template>
                 </el-table-column>
                 <el-table-column align="center" label="计费类型">
                     <template slot-scope="scope">
-                        <span>{{scope.row.feeType}}</span>
+                        <span v-if="scope.row.feeType === 1">按条</span>
+                        <span v-else-if="scope.row.feeType === 2">包月</span>
+                        <span v-else-if="scope.row.feeType === 3">按分钟</span>
+                        <span v-else-if="scope.row.feeType === 9">免费</span>
                     </template>
                 </el-table-column>
                 <el-table-column align="center" label="价格">
@@ -55,9 +72,14 @@
                 
                 <el-table-column align="center" label="操作" class-name="mini-padding">
                     <template slot-scope="scope">
-                        <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteOperation(scope.row)"></el-button>
-                        <el-button size="mini" type="primary" icon="el-icon-edit" @click="editOperation(scope.row)"></el-button>
-                        <el-button size="mini" type="primary" icon="el-icon-share" @click="businessOperation(scope.row)">添加指令</el-button>
+                        <el-dropdown split-button type="primary" @click="serviceCodeRouteDialog(scope.row)" @command="otherCommand(scope.row, command)">
+                        添加指令
+                            <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item>开通省份</el-dropdown-item>
+                                <el-dropdown-item @click.native="editOperation(scope.row)" divided>编辑</el-dropdown-item>
+                                <el-dropdown-item @click.native="deleteOperation(scope.row)">删除</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
                     </template>
                 </el-table-column>
             </el-table>
@@ -67,12 +89,15 @@
             </div>
         </div>
         <el-dialog title="添加业务代码" :visible.sync="dialogFormVisible">
-            <el-form :model="temp" :rules="rules" ref="addServiceCodeForm" label-position="left" label-width="100px">
-                <el-form-item label="网关" prop="gatwayId">
-                    <el-select v-model="temp.gatwayId" placeholder="请选择">
+            <el-form :model="temp" :rules="sCodRules" ref="addServiceCodeForm" label-position="left" label-width="100px">
+                <el-form-item label="网关" prop="gatewayId">
+                    <el-select v-model="temp.gatewayId" placeholder="请选择">
                         <el-option v-for="item in gatewayList" :key="item.gatewayId" :label="item.name" :value="item.gatewayId">
                         </el-option>
                     </el-select>
+                </el-form-item>
+                <el-form-item label="业务名称" prop="codeName">
+                    <el-input v-model="temp.codeName" placeholder="业务名称" style="width:200px;"></el-input>
                 </el-form-item>
                 <el-form-item label="业务代码" prop="codeId">
                     <el-input v-model="temp.codeId" placeholder="业务代码" style="width:100px;"></el-input>
@@ -94,8 +119,8 @@
                         <el-radio :label="9">免费</el-radio>
                     </el-radio-group>
                 </el-form-item>
-                <el-form-item label="费率" prop="feeValue">
-                    <el-input v-model="temp.feeValue" placeholder="费率" style="width:100px;"></el-input>
+                <el-form-item label="费率（分）" prop="feeValue">
+                    <el-input v-model.number="temp.feeValue" placeholder="费率" style="width:100px;"></el-input>
                 </el-form-item>
                 <el-form-item label="描述" prop="description">
                     <el-input type="textarea" :rows="3" v-model="temp.description" placeholder="描述"></el-input>
@@ -106,10 +131,11 @@
                 <el-button type="primary" @click="submitForm('addServiceCodeForm')">确定</el-button>
             </div>
         </el-dialog>
-        <el-dialog title="添加指令">
+        <!-- 添加路由指令dialog -->
+        <el-dialog title="添加指令" :visible.sync="routeDialogFormVisible">
             <el-form :model="routeTemp" :rules="routeRules" ref="addServiceCodeRouteForm" label-position="left" label-width="100px">
                 <el-form-item label="业务代码" prop="serviceCodeId">
-                    <el-input v-model="routeTemp.serviceCodeId" placeholder="长号码" style="width:300px;"></el-input>
+                    <el-input v-model="routeTemp.serviceCodeId" placeholder="长号码" style="width:300px;" :disabled="true"></el-input>
                 </el-form-item>
                 <el-form-item label="指令" prop="orderCode">
                     <el-input v-model="routeTemp.orderCode" placeholder="订购指令" style="width:300px;"></el-input>
@@ -121,7 +147,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="目的号码" prop="orderDest">
-                    <el-input v-model="routeTemp.orderDest" placeholder="目的号码"></el-input>
+                    <el-input v-model="routeTemp.orderDest" placeholder="目的号码" style="width:300px;"></el-input>
                 </el-form-item>
                 <el-form-item label="目的号码匹配" prop="orderDestCheckFlag">
                     <el-select v-model="routeTemp.orderDestCheckFlag" placeholder="请选择">
@@ -130,7 +156,12 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="类型" prop="type">
-                    <el-input v-model="routeTemp.type" placeholder="类型"></el-input>
+                    <el-radio-group v-model="routeTemp.type">
+                        <el-radio :label="1">点播</el-radio>
+                        <el-radio :label="2">定制</el-radio>
+                        <el-radio :label="3">取消定制</el-radio>
+                        <el-radio :label="4">普通上行</el-radio>
+                    </el-radio-group>
                 </el-form-item>
                 
             </el-form>
@@ -156,7 +187,7 @@ export default {
                 codeId: undefined,
                 productId: undefined,
                 codeName: undefined,
-                gatwayId: undefined,
+                gatewayId: undefined,
                 gatewayPort: undefined,
                 codeType: undefined,
                 feeType: 1,
@@ -171,7 +202,7 @@ export default {
                 orderCodeCheckFlag: undefined,
                 orderDest: undefined,
                 orderDestCheckFlag: undefined,
-                type: undefined
+                type: 1
             },
             routeTypeOptions: RouteTypeOptionsEnum,
             codeTypeOptions: ServiceCodeEnum,
@@ -186,41 +217,48 @@ export default {
                 pageSize: 20,
                 pageNumber: 1
             },
-            rules: {
-                name: [
-                    {
+            sCodRules: {
+                gatewayId: [{ required: true, message: '请选择网关'}],
+                codeId: [{
                         required: true,
-                        message: "网关名称",
+                        message: "业务代码不能为空",
                         trigger: "blur"
                     }
                 ],
-                longTermid: [
+                codeName: [
                     {
                         required: true,
-                        message: "请输入长号码",
-                        trigger: "blur"
-                    }
-
-                ],
-                port: [
-                    {
-                        required: true,
-                        message: "请输入网关端口",
+                        message: "业务名称不能为空",
                         trigger: "blur"
                     }
                 ],
-                state: [
+                codeType: [
                     {
                         required: true,
-                        message: "请选择网关状态",
+                        message: "请选择代码类型",
                         trigger: "blur"
                     }
+                ],
+                feeType: [
+                    {
+                        required: true,
+                        message: "请选择计费类型",
+                        trigger: "blur"
+                    }
+                ],
+                feeValue: [
+                    { required: true, message: "费率不能为空"},
+                    { type: 'number', message: '费率必须为数字值'}
                 ]
+            },
+            routeRules: {
+
             }
         };
     },
     created() {
         this.fetchList();
+        this.fetchGateway();
     },
     methods: {
         fetchGateway() {
@@ -238,6 +276,7 @@ export default {
                     this.listLoading = false;
                 }, 1.5 * 1000);
                 if (res.code === 0) {
+                    console.log(JSON.stringify(res.data.serviceCodeList))
                     (this.dataList = res.data.serviceCodeList),
                         (this.total = res.data.page.total);
                 } else {
@@ -268,13 +307,25 @@ export default {
                 codeId: undefined,
                 productId: undefined,
                 codeName: undefined,
-                gatwayId: undefined,
+                gatewayId: undefined,
                 gatewayPort: undefined,
                 codeType: undefined,
                 feeType: 1,
                 feeValue: undefined
             };
             this.gatewayList = null
+        },
+        resetRouteTemp(row) {
+            this.routeTemp = {
+                codeRouteId: undefined,
+                serviceCodePkid: row.codePk,
+                serviceCodeId: row.codeId,
+                orderCode: undefined,
+                orderCodeCheckFlag: undefined,
+                orderDest: undefined,
+                orderDestCheckFlag: undefined,
+                type: 1
+            }
         },
         deleteOperation(row) {
             let params = { pkId: row.gatewayId };
@@ -303,7 +354,7 @@ export default {
                 codeId: row.codeId,
                 productId: row.productId,
                 codeName: row.codeName,
-                gatwayId: row.gatwayId,
+                gatewayId: row.gatewayId,
                 gatewayPort: row.gatewayPort,
                 codeType: row.codeType,
                 feeType: row.feeType,
@@ -322,7 +373,6 @@ export default {
             //显示添加业务代码窗口
             //添加
             this.resetTemp();
-            this.fetchGateway();
             this.dialogStatus = "create";
             this.dialogFormVisible = true;
             this.$nextTick(() => {
@@ -333,52 +383,101 @@ export default {
             //点击确定按钮
             this.$refs[formName].validate(valid => {
                 if (valid) {
-                    if (this.temp.rowId == null) {
-                        addServiceCode(this.temp).then(res => {
-                            if (res.code === 0) {
-                                this.dialogFormVisible = false;
-                                this.dataList.unshift(this.temp);
-                                this.$notify({
-                                    title: "成功",
-                                    message: "创建成功",
-                                    type: "success",
-                                    duration: 2000
-                                });
-                                this.fetchList();
-                            } else {
-                                this.$notify({
-                                    title: "失败",
-                                    message: "添加失败",
-                                    type: "error",
-                                    duration: 2000
-                                });
-                            }
-                        });
-                    } else {
-                        editServiceCode(this.temp).then(res => {
-                            if (res.code === 0) {
-                                this.dialogFormVisible = false;
-                                this.dataList.unshift(this.temp);
-                                this.$notify({
-                                    title: "成功",
-                                    message: "修改成功",
-                                    type: "success",
-                                    duration: 2000
-                                });
-                                this.fetchList();
-                            } else {
-                                this.$notify({
-                                    title: "失败",
-                                    message: "修改失败",
-                                    type: "error",
-                                    duration: 2000
-                                });
-                            }
-                        });
+                    if (formName === 'addServiceCodeForm') {
+                        console.log(JSON.stringify(this.temp))
+                        if (this.temp.codePk == null) {
+                            addServiceCode(this.temp).then(res => {
+                                if (res.code === 0) {
+                                    this.dialogFormVisible = false;
+                                    this.dataList.unshift(this.temp);
+                                    this.$notify({
+                                        title: "成功",
+                                        message: "创建成功",
+                                        type: "success",
+                                        duration: 2000
+                                    });
+                                    this.fetchList();
+                                } else {
+                                    this.$notify({
+                                        title: "失败",
+                                        message: "添加失败",
+                                        type: "error",
+                                        duration: 2000
+                                    });
+                                }
+                            });
+                        } else {
+                            editServiceCode(this.temp).then(res => {
+                                if (res.code === 0) {
+                                    this.dialogFormVisible = false;
+                                    this.dataList.unshift(this.temp);
+                                    this.$notify({
+                                        title: "成功",
+                                        message: "修改成功",
+                                        type: "success",
+                                        duration: 2000
+                                    });
+                                    this.fetchList();
+                                } else {
+                                    this.$notify({
+                                        title: "失败",
+                                        message: "修改失败",
+                                        type: "error",
+                                        duration: 2000
+                                    });
+                                }
+                            });
+                        }
+                    }
+                    if (formName === 'addServiceCodeRouteForm') {
+                        if (this.routeTemp.codePk == null) {
+                            addServiceCodeRoute(this.routeTemp).then(res => {
+                                if (res.code === 0) {
+                                    this.dialogFormVisible = false;
+                                    this.dataList.unshift(this.temp);
+                                    this.$notify({ title: "成功", message: "创建成功", type: "success", duration: 2000 });
+                                    this.fetchList();
+                                } else {
+                                    this.$notify({ title: "失败", message: "添加失败", type: "error", duration: 2000});
+                                }
+                            });
+                        } else {
+                            editServiceCodeRoute(this.routeTemp).then(res => {
+                                if (res.code === 0) {
+                                    this.dialogFormVisible = false;
+                                    this.dataList.unshift(this.routeTemp);
+                                    this.$notify({ title: "成功", message: "修改成功", type: "success", duration: 2000 });
+                                    this.fetchList();
+                                } else {
+                                    this.$notify({ title: "失败", message: "修改失败", type: "error", duration: 2000});
+                                }
+                            });
+                        }
                     }
                 }
             });
+        },
+        gatewaySelect() {
+            this.gatewayList.forEach((value, index, array)=>{
+                if (value.gatewayId == this.temp.gatewayId) {
+                    this.temp.gatewayPort = value.port
+                }
+                    
+            });
+        },
+        serviceCodeRouteDialog(row) {
+            this.resetRouteTemp(row)
+            this.dialogStatus = "create";
+            this.routeDialogFormVisible = true;
+            this.$nextTick(() => {
+                this.$refs["addServiceCodeRouteForm"].clearValidate();
+            });
+        },
+        otherCommand(row, command) {
+            console.log(JSON.stringify(row))
+            console.log(JSON.stringify(command))
         }
     }
 };
 </script>
+

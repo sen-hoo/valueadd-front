@@ -13,7 +13,7 @@ export function addServiceCodeRoute(serviceCodeRoute) {
     return request({
         url: '/serviceCodeRoute/add',
         method: 'post',
-        params: query
+        params: serviceCodeRoute
     })
 }
 /**删除 */
