@@ -66,7 +66,9 @@
                     <template slot-scope="scope">
                         <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteOperation(scope.row)"></el-button>
                         <el-button size="mini" type="primary" icon="el-icon-edit" @click="editOperation(scope.row)"></el-button>
-                        <el-button size="mini" type="primary" icon="el-icon-share" @click="businessOperation(scope.row)">业务代码</el-button>
+                        <router-link :to="{name:'serviceCode', params:{keyword: scope.row.name}}">
+                            <el-button size="mini" type="primary" icon="el-icon-share">业务代码</el-button>
+                        </router-link>
                     </template>
                 </el-table-column>
             </el-table>
@@ -291,9 +293,6 @@ export default {
             this.$nextTick(() => {
                 this.$refs["addGatewayForm"].clearValidate();
             });
-        },
-        businessOperation(row) {
-            //跳转到业务管理标签页
         },
         handleCreate() {
             //显示添加合作方窗口

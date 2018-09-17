@@ -84,11 +84,13 @@
                 
                 <el-table-column align="center" label="操作" class-name="mini-padding">
                     <template slot-scope="scope">
-                        <el-dropdown split-button type="primary" @click="serviceCodeRouteDialog(scope.row)" @command="otherCommand(scope.row, command)">
+                        <el-dropdown split-button type="primary" @click="serviceCodeRouteDialog(scope.row)">
                         添加指令
                             <el-dropdown-menu slot="dropdown">
-                                <el-dropdown-item>开通省份</el-dropdown-item>
-                                <el-dropdown-item @click.native="editOperation(scope.row)" divided>编辑</el-dropdown-item>
+                                <router-link :to="'/sp/openconfig/edit/'+ scope.row.codeName +'/'+scope.row.codePk">
+                                    <el-dropdown-item>开通省份</el-dropdown-item>
+                                </router-link>
+                                <el-dropdown-item @click.native="editOperation(scope.row)" divided command>编辑</el-dropdown-item>
                                 <el-dropdown-item @click.native="deleteOperation(scope.row)">删除</el-dropdown-item>
                             </el-dropdown-menu>
                         </el-dropdown>
@@ -269,6 +271,9 @@ export default {
         };
     },
     created() {
+        const keyword = this.$route.params && this.$route.params.keyword
+        console.log(JSON.stringify(keyword))
+        this.listQuery.keyword=keyword
         this.fetchList();
         this.fetchGateway();
     },

@@ -29,28 +29,28 @@ const partnerRouter = {
     redirect: '/partner/business/smscode/index',
     children: [
         {
-            path: 'smscode',
-            component: () => import('@/views/partner/business/smscode'),
+            path: 'smscode/index',
+            component: () => import('@/views/partner/business/smscode/index'),
             name: 'smscode',
-            meta: {title: 'smscode'}
+            meta: {title: 'smscode', noCache: true}
         },
         {
             path: 'mmscode',
-            component: () => import('@/views/partner/business/mmscode'),
+            component: () => import('@/views/partner/business/mmscode/index'),
             name: 'mmscode',
-            meta: {title: 'mmscode'}
+            meta: {title: 'mmscode', noCache: true}
         },
         {
             path: 'ivrcode',
-            component: () => import('@/views/partner/business/ivrcode'),
+            component: () => import('@/views/partner/business/ivrcode/index'),
             name: 'ivrcode',
-            meta: {title: 'ivrcode'}
+            meta: {title: 'ivrcode', noCache: true}
         },
         {
             path: 'netcode',
-            component: () => import('@/views/partner/business/netcode'),
+            component: () => import('@/views/partner/business/netcode/index'),
             name: 'netcode',
-            meta: {title: 'netcode'}
+            meta: {title: 'netcode', noCache: true}
         }
     ]
   }]

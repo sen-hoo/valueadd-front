@@ -171,15 +171,22 @@ export const asyncRouterMap = [{
     }
   },
   {//业务代码
-    path: "code/index",
+    path: 'code/index',
     component: () =>
-      import("@/views/sp/code/index"),
-    name: "serviceCode",
+      import('@/views/sp/code/index'),
+    name: 'serviceCode',
     meta: {
-      title: "serviceCode",
+      title: 'serviceCode',
       //icon: 'table',
       // if do not set roles, means: this page does not require permission
     }
+  },
+  {
+    path: 'openconfig/edit/:sCodeName/:sCodePKId(\\d+)',
+    component: ()=> import('@/views/sp/code/directives/index'),
+    name: 'editDirectives',
+    meta: { title: 'editDirectives', noCache: 'true'},
+    hidden: true
   }]
 },
 //合作方
