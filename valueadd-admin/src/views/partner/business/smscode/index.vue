@@ -1,10 +1,13 @@
 <template>
     <div class="app-container">
         <div class="filter-container">
-            <el-select v-model="partnerId" placeholder="请选择合作方">
+            <el-select v-model="listQuery.partnerId" placeholder="请选择合作方" @change="onPartnerSelected">
                 <el-option v-for="item in partnerList" :key="item.cpId" :label="item.cpName" :value="item.cpId"></el-option>
             </el-select>
-            <el-button type="primary" @click="handleAddCPService" icon="el-icon-edit" class="filter-item">添加合作方业务</el-button>
+            <el-button type="primary"  style="margin-bottom:0px;" @click="handleAddCPService" icon="el-icon-edit" class="filter-item">添加合作方业务</el-button>
+        </div>
+        <div>
+            <p>当前合作方:[{{selectedPartnerName}}]</p>
         </div>
         <div class="table-container">
             <el-table :data="smsCpServiceList"  v-loading="listLoading" stripe highlight-current-row>
@@ -55,61 +58,85 @@
         <el-dialog title="添加短信业务" :visible.sync="serviceFormVisible">
             <el-form :model="cpServiceTemp" :rules="cpServiceRules" ref="addCPServiceForm" label-position="left" label-width="100px">
                 <el-row>
-                  <el-col :span="8">
+                  <el-col :span="12">
                     <el-form-item label="业务编号" prop="serviceCodeId">
-                        <el-input v-model="cpServiceTemp.serviceId" placeholder="长号码" :disabled="true"></el-input>
+                        <el-input v-model="cpServiceTemp.serviceId" placeholder="业务编号" style="width:100px;" :disabled="true"></el-input>
                     </el-form-item>
                   </el-col>
-                  <el-col :span="16">
+                  <el-col :span="12">
                     <el-form-item label="业务代码" prop="serviceCode">
-                        <el-input v-model="cpServiceTemp.serviceCode" placeholder="长号码" ></el-input>
+                        <el-select v-model="cpServiceTemp.serviceCode" placeholder="请选择">
+                          <el-option v-for="item in serviceCodeList" :key="item.codePk" :value="item.codeId" :label="item.codeId + ' | ' + item.codeName"></el-option>
+                        </el-select>
                     </el-form-item>
                   </el-col>
                 </el-row>
                 <el-form-item label="业务名称" prop="serviceName">
-                    <el-input v-model="cpServiceTemp.serviceName" placeholder="长号码" style="width:300px;"></el-input>
+                    <el-input v-model="cpServiceTemp.serviceName" placeholder="业务名称" style="width:300px;"></el-input>
                 </el-form-item>
                 <el-form-item label="分成比例" prop="proportion">
-                    <el-input v-model="cpServiceTemp.proportion" placeholder="长号码" style="width:300px;" ></el-input>
-                </el-form-item>
-                <el-form-item label="上行(MO)同步地址" prop="moUrl">
-                    <el-input v-model="cpServiceTemp.moUrl" placeholder="长号码" style="width:300px;" ></el-input>
-                </el-form-item>
-                <el-form-item label="状态报告(MR)同步地址" prop="mrUrl">
-                    <el-input v-model="cpServiceTemp.mrUrl" placeholder="长号码" style="width:300px;"></el-input>
+                    <el-input-number v-model="cpServiceTemp.proportion" placeholder="分成比例" :precision="2" :step="0.01" :max="10"></el-input-number>
                 </el-form-item>
                 <el-form-item label="业务处理地址" prop="handleUrl">
-                    <el-input v-model="cpServiceTemp.handleUrl" placeholder="长号码" style="width:300px;" ></el-input>
+                    <el-input v-model="cpServiceTemp.handleUrl" placeholder="业务处理地址"></el-input>
+                </el-form-item>
+                <el-form-item label="MO同步地址" prop="moUrl">
+                    <el-input v-model="cpServiceTemp.moUrl" placeholder="上行(MO)同步地址"></el-input>
+                </el-form-item>
+                <el-form-item label="MR同步地址" prop="mrUrl">
+                    <el-input v-model="cpServiceTemp.mrUrl" placeholder="状态报告(MR)同步地址"></el-input>
                 </el-form-item>
                 <el-form-item label="上行替换" prop="alterMo">
-                    <el-input v-model="cpServiceTemp.alterMo" placeholder="长号码" style="width:300px;" ></el-input>
+                    <el-input v-model="cpServiceTemp.alterMo" placeholder="上行替换" style="width:100px;" ></el-input>
                 </el-form-item>
-                <el-form-item label="同步类型" prop="syncType">
-                    <el-input v-model="cpServiceTemp.syncType" placeholder="长号码" style="width:300px;"></el-input>
-                </el-form-item>
-                <el-form-item label="同步协议" prop="syncProtocol">
-                    <el-input v-model="cpServiceTemp.syncProtocol" placeholder="长号码" style="width:300px;" ></el-input>
-                </el-form-item>
+                <el-row>
+                  <el-col :span="12">
+                    <el-form-item label="同步协议" prop="syncProtocol">
+                        <el-radio-group v-model="cpServiceTemp.syncProtocol">
+                            <el-radio :label="1">MO_MR</el-radio>
+                            <el-radio :label="2">MR</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="12">
+                    <el-form-item label="同步类型" prop="syncType">
+                        <el-radio-group v-model="cpServiceTemp.syncType">
+                            <el-radio :label="1">成功/失败</el-radio>
+                            <el-radio :label="2">成功</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
                 <el-form-item label="订购成功下发" prop="registMessage">
-                    <el-input v-model="cpServiceTemp.registMessage" placeholder="长号码" style="width:300px;"></el-input>
+                    <el-input :rows="2" type="textarea" v-model="cpServiceTemp.registMessage" placeholder="订购成功下发" style="width:500px;"></el-input>
                 </el-form-item>
                 <el-form-item label="订购失败下发" prop="registFailMessage">
-                    <el-input v-model="cpServiceTemp.registFailMessage" placeholder="长号码" style="width:300px;" ></el-input>
+                    <el-input v-model="cpServiceTemp.registFailMessage" placeholder="订购失败下发" style="width:300px;" ></el-input>
                 </el-form-item>
                 <el-form-item label="取消成功下发" prop="cancelMessage">
-                    <el-input v-model="cpServiceTemp.cancelMessage" placeholder="长号码" style="width:300px;" ></el-input>
+                    <el-input v-model="cpServiceTemp.cancelMessage" placeholder="取消成功下发" style="width:300px;" ></el-input>
                 </el-form-item>
                 <el-form-item label="取消失败下发" prop="cancelFailMesage">
-                    <el-input v-model="cpServiceTemp.cancelFailMesage" placeholder="长号码" style="width:300px;" ></el-input>
+                    <el-input v-model="cpServiceTemp.cancelFailMesage" placeholder="取消失败下发" style="width:300px;" ></el-input>
                 </el-form-item>
-                <el-form-item label="业务负责人" prop="agentMan">
-                    <el-input v-model="cpServiceTemp.agentMan" placeholder="长号码" style="width:300px;"></el-input>
-                </el-form-item>
-                <el-form-item label="技术负责人" prop="techMan">
-                    <el-input v-model="cpServiceTemp.techMan" placeholder="长号码" style="width:300px;" ></el-input>
-                </el-form-item>
+                <el-row>
+                  <el-col :span="8">
+                    <el-form-item label="业务负责人" prop="agentMan">
+                        <el-input v-model="cpServiceTemp.agentMan" placeholder="业务负责人" style="width: 100px;"></el-input>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="8">
+                    <el-form-item label="技术负责人" prop="techMan">
+                        <el-input v-model="cpServiceTemp.techMan" placeholder="技术负责人" style="width: 100px;"></el-input>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
                 <el-form-item label="状态" prop="status">
-                    <el-input v-model="cpServiceTemp.status" placeholder="长号码" style="width:300px;" ></el-input>
+                    <el-radio-group v-model="cpServiceTemp.status">
+                        <el-radio :label="1">激活</el-radio>
+                        <el-radio :label="2">同步暂停</el-radio>
+                        <el-radio :label="3">业务停止</el-radio>
+                    </el-radio-group>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -123,10 +150,12 @@
     </div>
 </template>
 <script>
+import { Message } from "element-ui";
 import { fetchPartnerList } from "@/api/partner";
-import { fetchPartnerServiceList } from "@/api/partnerService";
-import { ServiceCodeEnum } from "@/common"
-import { CPServiceStatus } from "@/common";
+import { fetchPartnerServiceList, getCPSN, addPartnerService, editPartnerService, deletePartnerService } from "@/api/partnerService";
+import { fetchAllServiceCode } from '@/api/serviceCode';
+import { ServiceCodeEnum, CPServiceStatus } from "@/common"
+
 export default {
     data() {
         return {
@@ -136,11 +165,14 @@ export default {
                 pageSize: 20,
                 pageNumber: 1
             },
+            selectedPartnerName: undefined,
             total: null,
             listLoading: false,
             partnerList: null,
+            serviceCodeList: null,
             smsCpServiceList: null,
             serviceFormVisible: false,
+            directivesFormVisible: false,
             cpServiceTemp: {
                 servicePkid: undefined,
                 serviceId: undefined,
@@ -151,7 +183,7 @@ export default {
                 gatewayPkid: undefined,
                 gatewayPort: undefined,
                 feeValue: undefined,
-                proportion: undefined,
+                proportion: 0.40,
                 status: CPServiceStatus.ACTIVATED,
                 alterMo: undefined,
                 registMessage: undefined,
@@ -161,8 +193,8 @@ export default {
                 moUrl: undefined,
                 mrUrl: undefined,
                 handleUrl: undefined,
-                syncType: undefined,
-                syncProtocol: undefined,
+                syncType: 2,
+                syncProtocol: 1,
                 agentMan: undefined,
                 techMan: undefined,
             },
@@ -183,7 +215,7 @@ export default {
                 gatewayPkid: undefined,
                 gatewayPort: undefined,
                 feeValue: undefined,
-                proportion: undefined,
+                proportion: 0.40,
                 status: CPServiceStatus.ACTIVATED,
                 alterMo: undefined,
                 registMessage: undefined,
@@ -193,8 +225,8 @@ export default {
                 moUrl: undefined,
                 mrUrl: undefined,
                 handleUrl: undefined,
-                syncType: undefined,
-                syncProtocol: undefined,
+                syncType: 2,
+                syncProtocol: 1,
                 agentMan: undefined,
                 techMan: undefined,
             }
@@ -205,6 +237,14 @@ export default {
                     this.partnerList = res.data.partnerList
                 }
             })
+        },
+        handleCurrentChange(pageNumber) {
+            this.listQuery.pageNumber = pageNumber;
+            this.fetchSmsServiceList();
+        },
+        handleSizeChange(pageSize) {
+            this.listQuery.pageSize = pageSize;
+            this.fetchSmsServiceList();
         },
         fetchSmsServiceList() {//获取短信业务
             this.listLoading = true
@@ -219,7 +259,27 @@ export default {
                 }
             })
         },
+        onPartnerSelected(value) {
+            console.log(JSON.stringify(value))
+            this.partnerList.forEach((item, index, array) => {
+                if (item.cpId === value) {
+                    this.selectedPartnerName = item.cpName
+                }
+            })
+            this.fetchSmsServiceList()
+
+        },
         handleAddCPService() {
+            if (this.selectedPartnerName === null || typeof(this.selectedPartnerName) === "undefined") {
+                Message({ message: "请选择要添加业务的合作方", type: "error", duration: 2 * 1000 })  
+                return ;
+            }
+            getCPSN({partnerId: this.listQuery.partnerId}).then((res)=>{
+                if (res.code === 0) {
+                    this.cpServiceTemp.serviceId = res.data.cpServiceId
+                    this.cpServiceTemp.serviceIdExtend = res.data.cpServiceIdExt
+                }
+            })
             this.resetCpServiceTemp()
             this.serviceFormVisible = true
             this.$nextTick(() => {
@@ -229,8 +289,16 @@ export default {
 
     },
     created() {
+        const cpId = this.$route.params && this.$route.params.partnerId
+        const cpName = this.$route.params && this.$route.params.partnerName
+        this.listQuery.partnerId = cpId
+        this.selectedPartnerName = cpName
         this.fetchPartnerList()
         this.fetchSmsServiceList()
+        fetchAllServiceCode({}).then((res)=>{
+            if (res.code === 0)
+                this.serviceCodeList = res.data.serviceCodeList
+        })
     }
 }
 </script>

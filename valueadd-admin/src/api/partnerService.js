@@ -31,3 +31,11 @@ export function deletePartnerService(pkId) {
         params: pkId
     })
 }
+
+export function getCPSN(partnerId) {
+    return request({
+        url: '/partnerService/searialNumber',
+        method: 'get',
+        params: partnerId
+    })
+}

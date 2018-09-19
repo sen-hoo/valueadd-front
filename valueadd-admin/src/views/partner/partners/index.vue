@@ -59,16 +59,16 @@
                         <el-dropdown  @click="serviceCodeRouteDialog(scope.row)">
                             <el-button type="primary" size="mini">合作方业务<i class="el-icon-arrow-down el-icon--right"></i></el-button>
                             <el-dropdown-menu slot="dropdown">
-                                <router-link :to="{name:'smscode', params:{keyword: scope.row.cpId}}">
+                                <router-link :to="{name:'smscode', params:{partnerId: scope.row.cpId, partnerName: scope.row.cpName}}">
                                     <el-dropdown-item >短信业务</el-dropdown-item>
                                 </router-link>
-                                <router-link :to="{name:'mmscode', params:{keyword: scope.row.cpId}}">
+                                <router-link :to="{name:'mmscode', params:{partnerId: scope.row.cpId, partnerName: scope.row.cpName}}">
                                     <el-dropdown-item>彩信业务</el-dropdown-item>
                                 </router-link>
-                                <router-link :to="{name:'ivrcode', params:{keyword: scope.row.cpId}}">
+                                <router-link :to="{name:'ivrcode', params:{partnerId: scope.row.cpId, partnerName: scope.row.cpName}}">
                                     <el-dropdown-item>IVR业务</el-dropdown-item>
                                 </router-link>
-                                <router-link :to="{name:'netcode', params:{keyword: scope.row.cpId}}">
+                                <router-link :to="{name:'netcode', params:{partnerId: scope.row.cpId, partnerName: scope.row.cpName}}">
                                     <el-dropdown-item>联网业务</el-dropdown-item>
                                 </router-link>
                             </el-dropdown-menu>

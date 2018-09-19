@@ -8,6 +8,14 @@ export function fetchServiceCodeList(query) {
     })
 }
 
+export function fetchAllServiceCode(clause) {
+    return request({
+        url: '/serviceCode/listall',
+        method: 'get',
+        params: clause
+    })
+}
+
 export function addServiceCode(serviceCode) {
     return request({
         url: '/serviceCode/add',
