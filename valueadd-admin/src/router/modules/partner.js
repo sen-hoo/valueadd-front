@@ -51,6 +51,13 @@ const partnerRouter = {
             component: () => import('@/views/partner/business/netcode/index'),
             name: 'netcode',
             meta: {title: 'netcode', noCache: true}
+        },
+        {
+          path: 'ctrlconfig/index',
+          component: ()=> import('@/views/partner/business/openCtrlConfig/index'),
+          name: 'serviceCtrlConfig',
+          meta: { title: 'serviceCtrlConfig', noCache: 'true'},
+          hidden: true
         }
     ]
   }]

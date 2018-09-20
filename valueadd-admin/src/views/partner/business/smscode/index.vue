@@ -11,6 +11,34 @@
         </div>
         <div class="table-container">
             <el-table :data="smsCpServiceList"  v-loading="listLoading" stripe highlight-current-row>
+                <el-table-column align="center" label="展开" width="65"  type="expand">
+                    <template slot-scope="scope">
+                        <table cellspacing="0" cellpadding="0" border="0" class="el-table__body" style="width:100%;background:#F2F6FC;">
+                            <tr v-for="item in scope.row.CpServiceRoute">
+                                <td class="cell">
+                                    <span v-if="item.routeCodeCheckFlag === 1">{{item.routeCode}}（精确）</span>
+                                    <span v-else-if="item.routeCodeCheckFlag === 2">{{item.routeCode}}（模糊）</span>
+                                    <span v-else-if="item.routeCodeCheckFlag === 3">{{item.routeCode}}（正则）</span>
+                                </td>
+                                <td class="cell">
+                                     <span v-if="item.routeDestCheckFlag === 1">{{item.routeDest}}（精确）</span>
+                                     <span v-else-if="item.routeDestCheckFlag === 2">{{item.routeDest}}（模糊）</span>
+                                     <span v-else-if="item.routeDestCheckFlag === 3">{{item.routeDest}}（正则）</span>
+                                </td>
+                                <td class="cell">
+                                     <span v-if="item.routeType === 1">点播</span>
+                                     <span v-else-if="item.routeType === 2">定制</span>
+                                     <span v-else-if="item.routeType === 3">取消定制</span>
+                                     <span v-else-if="item.routeType === 4">普通上行</span>
+                                 </td>
+                                 <td>
+                                    <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteSCodeRoute(item.cpServiceRouteId)"></el-button>
+                                    <el-button size="mini" type="primary" icon="el-icon-edit" @click="editSCodeRoute(item)"></el-button>
+                                 </td>
+                            </tr>
+                        </table>
+                    </template>
+                </el-table-column>
                 <el-table-column label="业务编号">
                     <template slot-scope="scope">
                         <span>{{scope.row.serviceId}}</span>
@@ -33,21 +61,42 @@
                 </el-table-column>
                 <el-table-column label="同步类型">
                     <template slot-scope="scope">
-                        <span>{{scope.row.syncType}}</span>
+                        <span v-if="scope.row.syncType === 1">成功/失败</span>
+                        <span v-if="scope.row.syncType === 2">成功</span>
                     </template>
                 </el-table-column>
                 <el-table-column label="同步协议">
                     <template slot-scope="scope">
-                        <span>{{scope.row.syncProtocol}}</span>
+                        <span v-if="scope.row.syncProtocol === 1">MO_MR</span>
+                        <span v-if="scope.row.syncProtocol === 2">MR</span>
+                    </template>
+                </el-table-column>
+                <el-table-column label="风险规避">
+                    <template slot-scope="scope">
+                        <span v-if="scope.row.isDeduct === 1">规避</span>
+                        <span v-if="scope.row.isDeduct === 0">不规避</span>
                     </template>
                 </el-table-column>
                 <el-table-column label="状态">
                     <template slot-scope="scope">
-                        <span>{{scope.row.status}}</span>
+                        <span v-if="scope.row.status === 1">激活</span>
+                        <span v-if="scope.row.status === 2">同步暂停</span>
+                        <span v-if="scope.row.status === 3">业务暂停</span>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作">
-                    
+                    <template slot-scope="scope">
+                        <el-dropdown split-button type="primary">
+                        添加指令
+                            <el-dropdown-menu slot="dropdown">
+                                <router-link :to="{name:'serviceCtrlConfig', params:{servicePkid: scope.row.servicePkid, serviceId: scope.row.serviceId, serviceName: scope.row.serviceName}}">
+                                    <el-dropdown-item>开通省份</el-dropdown-item>
+                                </router-link>
+                                <el-dropdown-item @click.native="editOperation(scope.row)" divided command>编辑</el-dropdown-item>
+                                <el-dropdown-item @click.native="deleteOperation(scope.row)">删除</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
+                    </template>
                 </el-table-column>
             </el-table>
             <div class="pagination-container">
@@ -55,28 +104,46 @@
                 </el-pagination>
             </div>
         </div>
-        <el-dialog title="添加短信业务" :visible.sync="serviceFormVisible">
+        <el-dialog :title="'添加短信业务 -【' + selectedPartnerName+'】'" :visible.sync="serviceFormVisible" :before-close="handleClose">
             <el-form :model="cpServiceTemp" :rules="cpServiceRules" ref="addCPServiceForm" label-position="left" label-width="100px">
                 <el-row>
-                  <el-col :span="12">
+                  <el-col :span="8">
                     <el-form-item label="业务编号" prop="serviceCodeId">
                         <el-input v-model="cpServiceTemp.serviceId" placeholder="业务编号" style="width:100px;" :disabled="true"></el-input>
                     </el-form-item>
                   </el-col>
-                  <el-col :span="12">
+                  <el-col :span="8">
                     <el-form-item label="业务代码" prop="serviceCode">
-                        <el-select v-model="cpServiceTemp.serviceCode" placeholder="请选择">
+                        <el-select v-model="cpServiceTemp.serviceCode" placeholder="请选择" @change="onServinceCodeSelected">
                           <el-option v-for="item in serviceCodeList" :key="item.codePk" :value="item.codeId" :label="item.codeId + ' | ' + item.codeName"></el-option>
                         </el-select>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="8">
+                    <el-form-item label="价格(分)" prop="feeValue">
+                        <el-input v-model="cpServiceTemp.feeValue" placeholder="价格" style="width:100px;" :disabled="true"></el-input>
                     </el-form-item>
                   </el-col>
                 </el-row>
                 <el-form-item label="业务名称" prop="serviceName">
                     <el-input v-model="cpServiceTemp.serviceName" placeholder="业务名称" style="width:300px;"></el-input>
                 </el-form-item>
-                <el-form-item label="分成比例" prop="proportion">
-                    <el-input-number v-model="cpServiceTemp.proportion" placeholder="分成比例" :precision="2" :step="0.01" :max="10"></el-input-number>
-                </el-form-item>
+                <el-row>
+                  <el-col :span="12">
+                    <el-form-item label="分成比例" prop="proportion">
+                        <el-input-number v-model="cpServiceTemp.proportion" placeholder="分成比例" :precision="2" :step="0.01" :max="10"></el-input-number>
+                    </el-form-item>
+
+                  </el-col>
+                  <el-col :span="12">
+                    <el-form-item label="是否规避" prop="isDeduct">
+                        <el-radio-group v-model="cpServiceTemp.isDeduct">
+                            <el-radio :label="1">规避</el-radio>
+                            <el-radio :label="0">不规避</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                  </el-col>
+                </el-row>
                 <el-form-item label="业务处理地址" prop="handleUrl">
                     <el-input v-model="cpServiceTemp.handleUrl" placeholder="业务处理地址"></el-input>
                 </el-form-item>
@@ -120,14 +187,14 @@
                     <el-input v-model="cpServiceTemp.cancelFailMesage" placeholder="取消失败下发" style="width:300px;" ></el-input>
                 </el-form-item>
                 <el-row>
-                  <el-col :span="8">
+                  <el-col :span="12">
                     <el-form-item label="业务负责人" prop="agentMan">
-                        <el-input v-model="cpServiceTemp.agentMan" placeholder="业务负责人" style="width: 100px;"></el-input>
+                        <el-input v-model="cpServiceTemp.agentMan" placeholder="业务负责人" style="width: 200px;"></el-input>
                     </el-form-item>
                   </el-col>
-                  <el-col :span="8">
+                  <el-col :span="12">
                     <el-form-item label="技术负责人" prop="techMan">
-                        <el-input v-model="cpServiceTemp.techMan" placeholder="技术负责人" style="width: 100px;"></el-input>
+                        <el-input v-model="cpServiceTemp.techMan" placeholder="技术负责人" style="width: 200px;"></el-input>
                     </el-form-item>
                   </el-col>
                 </el-row>
@@ -140,8 +207,8 @@
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="routeDialogFormVisible = false">取消</el-button>
-                <el-button type="primary" @click="submitForm('addServiceCodeRouteForm')">确定</el-button>
+                <el-button @click="serviceFormVisible = false">取消</el-button>
+                <el-button type="primary" @click="submitForm('addCPServiceForm')">确定</el-button>
             </div>
         </el-dialog>
         <el-dialog title="添加指令" :visible.sync="directivesFormVisible">
@@ -184,6 +251,7 @@ export default {
                 gatewayPort: undefined,
                 feeValue: undefined,
                 proportion: 0.40,
+                isDeduct: 1,
                 status: CPServiceStatus.ACTIVATED,
                 alterMo: undefined,
                 registMessage: undefined,
@@ -216,6 +284,7 @@ export default {
                 gatewayPort: undefined,
                 feeValue: undefined,
                 proportion: 0.40,
+                isDeduct: 1,
                 status: CPServiceStatus.ACTIVATED,
                 alterMo: undefined,
                 registMessage: undefined,
@@ -269,6 +338,18 @@ export default {
             this.fetchSmsServiceList()
 
         },
+        onServinceCodeSelected(value) {
+            this.serviceCodeList.forEach((item, index, array)=>{
+                if (item.codeId === value) {
+                    console.log(JSON.stringify(item))
+                    this.cpServiceTemp.feeValue = item.feeValue
+                    this.cpServiceTemp.serviceCodePkid = item.codePk
+                    this.cpServiceTemp.gatewayPkid = item.gatewayId
+                    this.cpServiceTemp.gatewayPort = item.gatewayPort
+
+                }
+            })
+        },
         handleAddCPService() {
             if (this.selectedPartnerName === null || typeof(this.selectedPartnerName) === "undefined") {
                 Message({ message: "请选择要添加业务的合作方", type: "error", duration: 2 * 1000 })  
@@ -285,6 +366,39 @@ export default {
             this.$nextTick(() => {
                 this.$refs["addCPServiceForm"].clearValidate();
             });
+        },
+        handleClose(done) {
+            this.$confirm('确认关闭？').then(_=>{
+                done();
+            })
+            .catch(_ => {});
+        },
+        submitForm(formName) {
+            this.$refs[formName].validate(valid => {
+                    if (valid) {
+                        if (formName === 'addCPServiceForm') {
+                            if (this.cpServiceTemp.servicePkid == null) {//添加合作方业务
+                                addPartnerService(this.cpServiceTemp).then(res=> {
+                                    if (res.code === 0) {
+                                        this.addCPServiceForm = false
+                                        this.$notify({title: "成功", message: "创建成功", type: "success", duration: 2000})
+                                    } else {
+                                        this.$notify({title: "失败", message: "添加失败", type: "error", duration: 2000})
+                                    }
+                                })
+                            } else {//编辑
+                                editPartnerService(this.cpServiceTemp).then(res=>{
+                                    if (res.code === 0) {
+                                        this.addCPServiceForm = false
+                                        this.$notify({title: "成功", message: "编辑成功", type: "success", duration: 2000})
+                                    } else {
+                                        this.$notify({title: "失败", message: "编辑失败", type: "error", duration: 2000})
+                                    }
+                                })
+                            }
+                        }
+                    }
+            })
         },
 
     },
