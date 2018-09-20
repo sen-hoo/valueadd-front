@@ -8,14 +8,6 @@ export function fetchPartnerServiceCtrlList(query) {
     })
 }
 
-export function addpartnerServiceCtrl(partnerServiceCtrl) {
-    return request({
-        url: '/partnerServiceCtrl/add',
-        method: 'post',
-        params: partnerServiceCtrl
-    })
-}
-
 export function editpartnerServiceCtrl(partnerServiceCtrl) {
     return request({
         url: '/partnerServiceCtrl/edit',

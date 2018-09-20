@@ -86,7 +86,7 @@
                 </el-table-column>
                 <el-table-column label="操作">
                     <template slot-scope="scope">
-                        <el-dropdown split-button type="primary">
+                        <el-dropdown split-button type="primary"  @click="handleAddCpSrviceRoute(scope.row)">
                         添加指令
                             <el-dropdown-menu slot="dropdown">
                                 <router-link :to="{name:'serviceCtrlConfig', params:{servicePkid: scope.row.servicePkid, serviceId: scope.row.serviceId, serviceName: scope.row.serviceName}}">
@@ -211,8 +211,61 @@
                 <el-button type="primary" @click="submitForm('addCPServiceForm')">确定</el-button>
             </div>
         </el-dialog>
-        <el-dialog title="添加指令" :visible.sync="directivesFormVisible">
+        <el-dialog title="添加指令" :visible.sync="cpSerivceRouteFormVisible">
+            <el-form :model="serviceRouteTemp" :rules="cpServiceRouteRules" ref="addcpServiceRouteForm" label-position="left" label-width="100px">
+                <el-form-item label="代码名称" prop="serviceName">
+                    <el-input v-model="serviceRouteTemp.serviceName" placeholder="长号码" style="width:200px;" :disabled="true"></el-input>
+                </el-form-item>
+                <el-form-item label="业务代码" prop="serviceCode">
+                    <el-input v-model="serviceRouteTemp.serviceCode" placeholder="长号码" style="width:100px;" :disabled="true"></el-input>
+                </el-form-item>
+                <el-row>
+                    <el-col :span="24">
+                        <el-form-item label="指令" prop="orderCode">
+                            <el-select v-model="serviceRouteTemp.order" placeholder="请选择">
+                                <el-option v-for="item in serviceCodeRouteList" :key="item.orderCode" :label="handleLable(item, 1)" :value="item.orderCode"></el-option>
+                            </el-select>
+                            <el-input v-model="serviceRouteTemp.routeCodeExt" placeholder="扩展" style="width:100px;"></el-input>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+                <el-form-item label="指令匹配" prop="routeCodeCheckFlag">
+                    <el-select v-model="serviceRouteTemp.routeCodeCheckFlag" placeholder="请选择">
+                        <el-option v-for="item in routeTypeOptions" :key="item.type" :label="item.label" :value="item.type">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-row>
+                    <el-col :span="24">
+                        <el-form-item label="目的号码" prop="orderDest">
+                            <!-- //TODO -->
+                            <el-select v-model="serviceRouteTemp.dest" placeholder="请选择">
+                                <el-option v-for="item in serviceCodeRouteList" :key="item.orderDest" :label="handleLable(item, 2)" :value="item.orderDest"></el-option>
+                            </el-select>
+                            <el-input v-model="serviceRouteTemp.routeDestExt" placeholder="扩展" style="width:100px;"></el-input>
+                        </el-form-item>
 
+                    </el-col>
+                </el-row>
+                <el-form-item label="目的号码匹配" prop="routeDestCheckFlag">
+                    <el-select v-model="serviceRouteTemp.routeDestCheckFlag" placeholder="请选择">
+                        <el-option v-for="item in routeTypeOptions" :key="item.type" :label="item.label" :value="item.type"></el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="类型" prop="routeType">
+                    <el-radio-group v-model="serviceRouteTemp.routeType" disabled>
+                        <el-radio :label="1">点播</el-radio>
+                        <el-radio :label="2">定制</el-radio>
+                        <el-radio :label="3">取消定制</el-radio>
+                        <el-radio :label="4">普通上行</el-radio>
+                    </el-radio-group>
+                </el-form-item>
+                
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="cpSerivceRouteFormVisible = false">取消</el-button>
+                <el-button type="primary" @click="submitForm('addcpServiceRouteForm')">确定</el-button>
+            </div>
         </el-dialog>
     </div>
 </template>
@@ -221,7 +274,8 @@ import { Message } from "element-ui";
 import { fetchPartnerList } from "@/api/partner";
 import { fetchPartnerServiceList, getCPSN, addPartnerService, editPartnerService, deletePartnerService } from "@/api/partnerService";
 import { fetchAllServiceCode } from '@/api/serviceCode';
-import { ServiceCodeEnum, CPServiceStatus } from "@/common"
+import { fetchServiceCodeRouteList } from '@/api/serviceCodeRoute'
+import { ServiceCodeEnum, CPServiceStatus, RouteTypeOptionsEnum } from "@/common"
 
 export default {
     data() {
@@ -239,7 +293,7 @@ export default {
             serviceCodeList: null,
             smsCpServiceList: null,
             serviceFormVisible: false,
-            directivesFormVisible: false,
+            cpSerivceRouteFormVisible: false,
             cpServiceTemp: {
                 servicePkid: undefined,
                 serviceId: undefined,
@@ -266,7 +320,25 @@ export default {
                 agentMan: undefined,
                 techMan: undefined,
             },
+            routeTypeOptions: RouteTypeOptionsEnum,
+            serviceCodeRouteList: null,
+            serviceRouteTemp: {
+                serviceName: undefined,
+                serviceCode: undefined,
+                cpServiceRouteId: undefined,
+                scodeRoutePkid: undefined,
+                routeCode: undefined,
+                routeCodeExt: undefined,
+                routeCodeCheckFlag: undefined,
+                routeDest: undefined,
+                routeDestExt: undefined,
+                routeDestCheckFlag: undefined,
+                routeType: undefined
+            },
             cpServiceRules: {
+
+            },
+            cpServiceRouteRules: {
 
             }
         }
@@ -372,6 +444,54 @@ export default {
                 done();
             })
             .catch(_ => {});
+        },
+        resetCpServiceRoute(row) {
+            this.serviceRouteTemp = {
+                serviceName: row.serviceName,
+                serviceCode: row.serviceCode,
+                cpServiceRouteId: undefined,
+                cpServicePkid: row.servicePkid,
+                cpServiceId: row.serviceId,
+                scodeRoutePkid: undefined,
+                routeCode: undefined,
+                routeCodeExt: undefined,
+                routeCodeCheckFlag: undefined,
+                routeDest: undefined,
+                routeDestExt: undefined,
+                routeDestCheckFlag: undefined,
+                routeType: undefined
+            }
+        },
+        handleAddCpSrviceRoute(row) {
+            this.resetCpServiceRoute(row)
+            //获取当前业务代码指令集合
+            const serviceCodePkid = row.serviceCodePkid
+            console.log(serviceCodePkid)
+            fetchServiceCodeRouteList({serviceCodePkid: serviceCodePkid}).then(res=>{
+                if (res.code === 0) {
+                    this.serviceCodeRouteList = res.data.serviceCodeRouteList
+                } else
+                    this.serviceCodeRouteList = null
+            })
+            this.cpSerivceRouteFormVisible = true
+            this.$nextTick(() => { this.$refs["addcpServiceRouteForm"].clearValidate() })
+        },
+        handleLable(item, type) {
+            if (type === 1) {
+                if (item.orderCodeCheckFlag === 1)
+                    return item.orderCode + ' - (精确)'
+                else if (item.orderCodeCheckFlag === 2)
+                    return item.orderCode + ' - (模糊)'
+                else if (item.orderCodeCheckFlag === 3)
+                    return item.orderCode + ' - (正则)'
+            } else {
+                if (item.orderDestCheckFlag === 1)
+                    return item.orderDest + ' - (精确)'
+                else if (item.orderDestCheckFlag === 2)
+                    return item.orderDest + ' - (模糊)'
+                else if (item.orderDestCheckFlag === 3)
+                    return item.orderDest + ' - (正则)'
+            }
         },
         submitForm(formName) {
             this.$refs[formName].validate(valid => {

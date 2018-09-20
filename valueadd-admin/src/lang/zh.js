@@ -17,6 +17,7 @@ export default {
     mmscode: '彩信业务',
     ivrcode: 'IVR业务',
     netcode: '联网业务',
+    serviceCtrlConfig: '业务开通省份',
     bill: '账单管理',
     billSpCode: '网关账单',
     billCpCode: '合作方账单',
