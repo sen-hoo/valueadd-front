@@ -14,7 +14,7 @@
                 <el-table-column align="center" label="展开" width="65"  type="expand">
                     <template slot-scope="scope">
                         <table cellspacing="0" cellpadding="0" border="0" class="el-table__body" style="width:100%;background:#F2F6FC;">
-                            <tr v-for="item in scope.row.CpServiceRoute">
+                            <tr v-for="item in scope.row.cpServiceRouteList">
                                 <td class="cell">
                                     <span v-if="item.routeCodeCheckFlag === 1">{{item.routeCode}}（精确）</span>
                                     <span v-else-if="item.routeCodeCheckFlag === 2">{{item.routeCode}}（模糊）</span>
@@ -32,8 +32,9 @@
                                      <span v-else-if="item.routeType === 4">普通上行</span>
                                  </td>
                                  <td>
-                                    <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteSCodeRoute(item.cpServiceRouteId)"></el-button>
-                                    <el-button size="mini" type="primary" icon="el-icon-edit" @click="editSCodeRoute(item)"></el-button>
+                                    <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteServiceRoute(item.cpServiceRouteId)"></el-button>
+                                    <el-button size="mini" type="primary" icon="el-icon-edit" @click="editServiceSCodeRoute(item,  scope.row.serviceName,  scope.row.serviceCode)"></el-button>
+                                    <el-button size="mini" type="primary" @click="simulateSyncClick(item,  scope.row.serviceName,  scope.row.serviceCode)">模拟同步</el-button>
                                  </td>
                             </tr>
                         </table>
@@ -92,8 +93,8 @@
                                 <router-link :to="{name:'serviceCtrlConfig', params:{servicePkid: scope.row.servicePkid, serviceId: scope.row.serviceId, serviceName: scope.row.serviceName}}">
                                     <el-dropdown-item>开通省份</el-dropdown-item>
                                 </router-link>
-                                <el-dropdown-item @click.native="editOperation(scope.row)" divided command>编辑</el-dropdown-item>
-                                <el-dropdown-item @click.native="deleteOperation(scope.row)">删除</el-dropdown-item>
+                                <el-dropdown-item @click.native="editPartnerServiceClick(scope.row)" divided command>编辑</el-dropdown-item>
+                                <el-dropdown-item @click.native="deletePartnerServiceClick(scope.row)">删除</el-dropdown-item>
                             </el-dropdown-menu>
                         </el-dropdown>
                     </template>
@@ -104,7 +105,7 @@
                 </el-pagination>
             </div>
         </div>
-        <el-dialog :title="'添加短信业务 -【' + selectedPartnerName+'】'" :visible.sync="serviceFormVisible" :before-close="handleClose">
+        <el-dialog :title="'添加/修改短信业务 -【' + selectedPartnerName+'】'" :visible.sync="serviceFormVisible" :before-close="handleClose">
             <el-form :model="cpServiceTemp" :rules="cpServiceRules" ref="addCPServiceForm" label-position="left" label-width="100px">
                 <el-row>
                   <el-col :span="8">
@@ -211,19 +212,19 @@
                 <el-button type="primary" @click="submitForm('addCPServiceForm')">确定</el-button>
             </div>
         </el-dialog>
-        <el-dialog title="添加指令" :visible.sync="cpSerivceRouteFormVisible">
+        <el-dialog title="添加/修改指令" :visible.sync="cpSerivceRouteFormVisible">
             <el-form :model="serviceRouteTemp" :rules="cpServiceRouteRules" ref="addcpServiceRouteForm" label-position="left" label-width="100px">
-                <el-form-item label="代码名称" prop="serviceName">
-                    <el-input v-model="serviceRouteTemp.serviceName" placeholder="长号码" style="width:200px;" :disabled="true"></el-input>
+                <el-form-item label="业务名称" prop="serviceName">
+                    <el-input v-model="serviceRouteTemp.serviceName" placeholder="业务名称" style="width:200px;" :disabled="true"></el-input>
                 </el-form-item>
                 <el-form-item label="业务代码" prop="serviceCode">
-                    <el-input v-model="serviceRouteTemp.serviceCode" placeholder="长号码" style="width:100px;" :disabled="true"></el-input>
+                    <el-input v-model="serviceRouteTemp.serviceCode" placeholder="业务代码" style="width:100px;" :disabled="true"></el-input>
                 </el-form-item>
                 <el-row>
                     <el-col :span="24">
-                        <el-form-item label="指令" prop="orderCode">
-                            <el-select v-model="serviceRouteTemp.order" placeholder="请选择">
-                                <el-option v-for="item in serviceCodeRouteList" :key="item.orderCode" :label="handleLable(item, 1)" :value="item.orderCode"></el-option>
+                        <el-form-item label="指令" prop="scodeRoutePkid">
+                            <el-select v-model="serviceRouteTemp.scodeRoutePkid" placeholder="请选择" @change="orderChange">
+                                <el-option v-for="item in serviceCodeRouteList" :key="item.codeRouteId" :label="handleLable(item, 1)" :value="item.codeRouteId"></el-option>
                             </el-select>
                             <el-input v-model="serviceRouteTemp.routeCodeExt" placeholder="扩展" style="width:100px;"></el-input>
                         </el-form-item>
@@ -238,9 +239,8 @@
                 <el-row>
                     <el-col :span="24">
                         <el-form-item label="目的号码" prop="orderDest">
-                            <!-- //TODO -->
-                            <el-select v-model="serviceRouteTemp.dest" placeholder="请选择">
-                                <el-option v-for="item in serviceCodeRouteList" :key="item.orderDest" :label="handleLable(item, 2)" :value="item.orderDest"></el-option>
+                            <el-select v-model="serviceRouteTemp.dest" placeholder="请选择" :disabled="true">
+                                <el-option v-for="item in serviceCodeRouteList" :key="item.codeRouteId" :label="handleLable(item, 2)" :value="item.codeRouteId"></el-option>
                             </el-select>
                             <el-input v-model="serviceRouteTemp.routeDestExt" placeholder="扩展" style="width:100px;"></el-input>
                         </el-form-item>
@@ -253,7 +253,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="类型" prop="routeType">
-                    <el-radio-group v-model="serviceRouteTemp.routeType" disabled>
+                    <el-radio-group v-model="serviceRouteTemp.routeType" :disabled='true'>
                         <el-radio :label="1">点播</el-radio>
                         <el-radio :label="2">定制</el-radio>
                         <el-radio :label="3">取消定制</el-radio>
@@ -273,6 +273,7 @@
 import { Message } from "element-ui";
 import { fetchPartnerList } from "@/api/partner";
 import { fetchPartnerServiceList, getCPSN, addPartnerService, editPartnerService, deletePartnerService } from "@/api/partnerService";
+import { addPartnerServiceRoute, editPartnerServiceRoute, deletePartnerServiceRoute } from '@/api/partnerServiceRoute'
 import { fetchAllServiceCode } from '@/api/serviceCode';
 import { fetchServiceCodeRouteList } from '@/api/serviceCodeRoute'
 import { ServiceCodeEnum, CPServiceStatus, RouteTypeOptionsEnum } from "@/common"
@@ -322,10 +323,17 @@ export default {
             },
             routeTypeOptions: RouteTypeOptionsEnum,
             serviceCodeRouteList: null,
+            //业务指令路由
             serviceRouteTemp: {
-                serviceName: undefined,
-                serviceCode: undefined,
+                serviceName: undefined,//显示使用
+                serviceCode: undefined,//显示使用
+                dest: undefined,//临时使用
+                //后台实体
                 cpServiceRouteId: undefined,
+                gatewayPkid: undefined,
+                gatewayPort: undefined,
+                cpServicePkid: undefined,
+                cpServiceId: undefined,
                 scodeRoutePkid: undefined,
                 routeCode: undefined,
                 routeCodeExt: undefined,
@@ -344,6 +352,14 @@ export default {
         }
     },
     methods: {
+        init() {
+            this.fetchPartnerList()
+            this.fetchSmsServiceList()
+            fetchAllServiceCode({}).then((res)=>{
+                if (res.code === 0)
+                    this.serviceCodeList = res.data.serviceCodeList
+            })
+        },
         resetCpServiceTemp() {
             this.cpServiceTemp = {
                 servicePkid: undefined,
@@ -435,9 +451,7 @@ export default {
             })
             this.resetCpServiceTemp()
             this.serviceFormVisible = true
-            this.$nextTick(() => {
-                this.$refs["addCPServiceForm"].clearValidate();
-            });
+            this.$nextTick(() => { this.$refs["addCPServiceForm"].clearValidate() });
         },
         handleClose(done) {
             this.$confirm('确认关闭？').then(_=>{
@@ -445,34 +459,44 @@ export default {
             })
             .catch(_ => {});
         },
-        resetCpServiceRoute(row) {
-            this.serviceRouteTemp = {
-                serviceName: row.serviceName,
-                serviceCode: row.serviceCode,
-                cpServiceRouteId: undefined,
-                cpServicePkid: row.servicePkid,
-                cpServiceId: row.serviceId,
-                scodeRoutePkid: undefined,
-                routeCode: undefined,
-                routeCodeExt: undefined,
-                routeCodeCheckFlag: undefined,
-                routeDest: undefined,
-                routeDestExt: undefined,
-                routeDestCheckFlag: undefined,
-                routeType: undefined
-            }
+        resetCpServiceRoute() {
+            this.serviceRouteTemp.serviceName = undefined,
+            this.serviceRouteTemp.serviceCode = undefined,
+            this.serviceRouteTemp.dest = undefined,
+            //后台实体
+            this.serviceRouteTemp.cpServiceRouteId = undefined,
+            this.serviceRouteTemp.gatewayPkid = undefined,
+            this.serviceRouteTemp.gatewayPort = undefined,
+            this.serviceRouteTemp.cpServicePkid = undefined,
+            this.serviceRouteTemp.cpServiceId = undefined,
+            this.serviceRouteTemp.scodeRoutePkid = undefined,
+            this.serviceRouteTemp.routeCode = undefined,
+            this.serviceRouteTemp.routeCodeExt = undefined,
+            this.serviceRouteTemp.routeCodeCheckFlag = undefined,
+            this.serviceRouteTemp.routeDest = undefined,
+            this.serviceRouteTemp.routeDestExt = undefined,
+            this.serviceRouteTemp.routeDestCheckFlag = undefined,
+            this.serviceRouteTemp.routeType = undefined
         },
-        handleAddCpSrviceRoute(row) {
-            this.resetCpServiceRoute(row)
-            //获取当前业务代码指令集合
-            const serviceCodePkid = row.serviceCodePkid
-            console.log(serviceCodePkid)
+        getServiceCodeRouteList(serviceCodePkid) {
             fetchServiceCodeRouteList({serviceCodePkid: serviceCodePkid}).then(res=>{
                 if (res.code === 0) {
                     this.serviceCodeRouteList = res.data.serviceCodeRouteList
                 } else
                     this.serviceCodeRouteList = null
             })
+        },
+        handleAddCpSrviceRoute(row) {//添加业务路由指令
+            //获取代码指令集合
+            this.getServiceCodeRouteList(row.serviceCodePkid)
+            //初始化数据
+            this.resetCpServiceRoute()//从cpservice跳转
+            this.serviceRouteTemp.serviceName = row.serviceName
+            this.serviceRouteTemp.serviceCode = row.serviceCode
+            this.serviceRouteTemp.gatewayPkid = row.gatewayPkid
+            this.serviceRouteTemp.gatewayPort = row.gatewayPort
+            this.serviceRouteTemp.cpServicePkid = row.servicePkid
+            this.serviceRouteTemp.cpServiceId = row.serviceId            
             this.cpSerivceRouteFormVisible = true
             this.$nextTick(() => { this.$refs["addcpServiceRouteForm"].clearValidate() })
         },
@@ -493,6 +517,77 @@ export default {
                     return item.orderDest + ' - (正则)'
             }
         },
+        orderChange(value) {//指令选择后改变
+            this.serviceCodeRouteList.forEach((item, index, array)=>{
+                if (item.codeRouteId === value) {
+                    this.serviceRouteTemp.dest = item.codeRouteId
+                    this.serviceRouteTemp.routeCode = item.orderCode
+                    this.serviceRouteTemp.routeDest = item.orderDest
+                    this.serviceRouteTemp.routeType = item.type
+                }
+            })
+        },
+        editPartnerServiceClick(row) {
+            this.resetCpServiceTemp()
+            this.$nextTick(() => { this.$refs["addCPServiceForm"].clearValidate() });
+            this.cpServiceTemp.servicePkid = row.servicePkid,
+            this.cpServiceTemp.serviceId = row.serviceIdExtend,
+            this.cpServiceTemp.serviceIdExtend = row.serviceIdExtend,
+            this.cpServiceTemp.serviceName = row.serviceName,
+            this.cpServiceTemp.serviceCodePkid = row.serviceCodePkid,
+            this.cpServiceTemp.serviceCode = row.serviceCode,
+            this.cpServiceTemp.gatewayPkid = row.gatewayPkid,
+            this.cpServiceTemp.gatewayPort = row.gatewayPort,
+            this.cpServiceTemp.feeValue = row.feeValue,
+            this.cpServiceTemp.proportion = row.proportion,
+            this.cpServiceTemp.isDeduct = row.isDeduct,
+            this.cpServiceTemp.status = row.status,
+            this.cpServiceTemp.alterMo = row.alterMo,
+            this.cpServiceTemp.registMessage = row.registMessage,
+            this.cpServiceTemp.cancelMessage = row.cancelMessage,
+            this.cpServiceTemp.registFailMessage = row.registFailMessage,
+            this.cpServiceTemp.cancelFailMesage = row.cancelFailMesage,
+            this.cpServiceTemp.moUrl = row.moUrl,
+            this.cpServiceTemp.mrUrl = row.mrUrl,
+            this.cpServiceTemp.handleUrl = row.handleUrl,
+            this.cpServiceTemp.syncType = row.syncType,
+            this.cpServiceTemp.syncProtocol = row.syncProtocol,
+            this.cpServiceTemp.agentMan = row.agentMan,
+            this.cpServiceTemp.techMan = row.techMan
+
+            this.serviceFormVisible = true
+        },
+        deletePartnerServiceClick(row) {
+
+        },
+        editServiceSCodeRoute(row, serviceName, serviceCode) {//编辑合作方业务路由指令
+            console.log(JSON.stringify(row))
+            this.getServiceCodeRouteList(row.serviceCodeRoute.serviceCodePkid)//获取业务代码指令
+            //初始化实体类
+            this.serviceRouteTemp.serviceName = serviceName
+            this.serviceRouteTemp.serviceCode = serviceCode
+
+            this.serviceRouteTemp.dest = row.scodeRoutePkid
+            this.serviceRouteTemp.cpServiceRouteId = row.cpServiceRouteId
+            this.serviceRouteTemp.gatewayPkid = row.gatewayPkid
+            this.serviceRouteTemp.gatewayPort = row.gatewayPort
+            this.serviceRouteTemp.cpServicePkid = row.cpServicePkid
+            this.serviceRouteTemp.cpServiceId = row.cpServiceId
+            this.serviceRouteTemp.scodeRoutePkid = row.scodeRoutePkid
+            this.serviceRouteTemp.routeCode = row.serviceCodeRoute.orderCode
+            this.serviceRouteTemp.routeCodeExt = row.routeCodeExt
+            this.serviceRouteTemp.routeCodeCheckFlag = row.routeCodeCheckFlag
+            this.serviceRouteTemp.routeDest = row.serviceCodeRoute.orderDest
+            this.serviceRouteTemp.routeDestExt = row.routeDestExt
+            this.serviceRouteTemp.routeDestCheckFlag = row.routeDestCheckFlag
+            this.serviceRouteTemp.routeType = row.routeType
+
+            //显示菜单
+            this.cpSerivceRouteFormVisible = true
+        },
+        deleteServiceRoute(row) {
+            
+        },
         submitForm(formName) {
             this.$refs[formName].validate(valid => {
                     if (valid) {
@@ -501,6 +596,7 @@ export default {
                                 addPartnerService(this.cpServiceTemp).then(res=> {
                                     if (res.code === 0) {
                                         this.addCPServiceForm = false
+                                        this.init()
                                         this.$notify({title: "成功", message: "创建成功", type: "success", duration: 2000})
                                     } else {
                                         this.$notify({title: "失败", message: "添加失败", type: "error", duration: 2000})
@@ -510,13 +606,50 @@ export default {
                                 editPartnerService(this.cpServiceTemp).then(res=>{
                                     if (res.code === 0) {
                                         this.addCPServiceForm = false
+                                        this.init()
                                         this.$notify({title: "成功", message: "编辑成功", type: "success", duration: 2000})
                                     } else {
                                         this.$notify({title: "失败", message: "编辑失败", type: "error", duration: 2000})
                                     }
                                 })
                             }
+                        }  else if (formName === 'addcpServiceRouteForm') {//增加合作方业务路由指令
+
+                            if (this.serviceRouteTemp.cpServiceRouteId == null) {//添加指令
+                               // 拼接指令和目的号
+                               if (this.serviceRouteTemp.routeCodeExt != null) {
+                                   this.serviceRouteTemp.routeCode = this.serviceRouteTemp.routeCode + this.serviceRouteTemp.routeCodeExt
+                               }
+                               if (this.serviceRouteTemp.routeDestExt != null) {
+                                   this.serviceRouteTemp.routeDest = this.serviceRouteTemp.routeDest + this.serviceRouteTemp.routeDestExt
+                               }
+                                addPartnerServiceRoute(this.serviceRouteTemp).then(res => {
+                                    if (res.code === 0) {
+                                        this.cpSerivceRouteFormVisible = false
+                                        this.init()
+                                        this.$notify({title: "添加成功", message: "添加路由指令成功", type: "success", duration: 2000})
+                                    } else 
+                                        this.$notify({title: "添加失败", message: "添加路由指令失败", type: "success", duration: 2000})
+                                })
+                            } else {//编辑指令
+                                if (this.serviceRouteTemp.routeCodeExt != null) {
+                                    this.serviceRouteTemp.routeCode = this.serviceRouteTemp.routeCode + this.serviceRouteTemp.routeCodeExt
+                                }
+                                if (this.serviceRouteTemp.routeDestExt != null) {
+                                    this.serviceRouteTemp.routeDest = this.serviceRouteTemp.routeDest + this.serviceRouteTemp.routeDestExt
+                                }
+                                editPartnerServiceRoute(this.serviceRouteTemp).then(res => {
+                                    if (res.code === 0) {
+                                        this.cpSerivceRouteFormVisible = false
+                                        this.init()
+                                        this.$notify({title: "修改成功", message: "修改路由指令成功", type: "success", duration: 2000})
+                                    } else 
+                                        this.$notify({title: "修改失败", message: "修改路由指令失败", type: "success", duration: 2000})
+                                })
+                            }
+                            
                         }
+                            
                     }
             })
         },
@@ -527,12 +660,7 @@ export default {
         const cpName = this.$route.params && this.$route.params.partnerName
         this.listQuery.partnerId = cpId
         this.selectedPartnerName = cpName
-        this.fetchPartnerList()
-        this.fetchSmsServiceList()
-        fetchAllServiceCode({}).then((res)=>{
-            if (res.code === 0)
-                this.serviceCodeList = res.data.serviceCodeList
-        })
+        this.init()
     }
 }
 </script>

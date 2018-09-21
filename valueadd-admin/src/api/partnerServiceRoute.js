@@ -1,32 +1,24 @@
 import request from '@/utils/request'
 
-export function fetchPartnerServiceList(query) {
+export function addPartnerServiceRoute(serviceRoute) {
     return request({
-        url: '/partnerService/list',
-        method: 'get',
-        params: query
-    })
-}
-
-export function addPartnerService(partnerService) {
-    return request({
-        url: '/partnerService/add',
+        url: '/partnerServiceRoute/add',
         method: 'post',
-        params: partnerService
+        params: serviceRoute
     })
 }
 
-export function editPartnerService(partnerService) {
+export function editPartnerServiceRoute(serviceRoute) {
     return request({
-        url: '/partnerService/edit',
+        url: '/partnerServiceRoute/edit',
         method: 'post',
-        params: partnerService
+        params: serviceRoute
     })
 }
 
-export function deletePartnerService(pkId) {
+export function deletePartnerServiceRoute(pkId) {
     return request({
-        url: '/partnerService/delete',
+        url: '/partnerServiceRoute/delete',
         method: 'get',
         params: pkId
     })
