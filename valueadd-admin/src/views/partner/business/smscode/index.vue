@@ -40,52 +40,52 @@
                         </table>
                     </template>
                 </el-table-column>
-                <el-table-column label="业务编号">
+                <el-table-column align="center" label="业务编号">
                     <template slot-scope="scope">
                         <span>{{scope.row.serviceId}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="业务名称">
+                <el-table-column align="center" label="业务名称">
                     <template slot-scope="scope">
                         <span>{{scope.row.serviceName}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="业务代码">
+                <el-table-column align="center" label="业务代码">
                     <template slot-scope="scope">
                         <span>{{scope.row.serviceCode}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="网关">
+                <el-table-column align="center" label="网关">
                     <template slot-scope="scope">
                         <span>{{scope.row.gatewayName}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="同步类型">
+                <el-table-column align="center" label="同步类型">
                     <template slot-scope="scope">
                         <span v-if="scope.row.syncType === 1">成功/失败</span>
                         <span v-if="scope.row.syncType === 2">成功</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="同步协议">
+                <el-table-column align="center" label="同步协议">
                     <template slot-scope="scope">
                         <span v-if="scope.row.syncProtocol === 1">MO_MR</span>
                         <span v-if="scope.row.syncProtocol === 2">MR</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="风险规避">
+                <el-table-column align="center" label="风险规避">
                     <template slot-scope="scope">
                         <span v-if="scope.row.isDeduct === 1">规避</span>
                         <span v-if="scope.row.isDeduct === 0">不规避</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="状态">
+                <el-table-column align="center" label="状态">
                     <template slot-scope="scope">
                         <span v-if="scope.row.status === 1">激活</span>
                         <span v-if="scope.row.status === 2">同步暂停</span>
                         <span v-if="scope.row.status === 3">业务暂停</span>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作">
+                <el-table-column align="center" label="操作">
                     <template slot-scope="scope">
                         <el-dropdown split-button type="primary"  @click="handleAddCpSrviceRoute(scope.row)">
                         添加指令

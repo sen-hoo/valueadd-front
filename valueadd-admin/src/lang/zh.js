@@ -24,6 +24,7 @@ export default {
     search: '搜索管理',
     searchOrder: '订购搜索',
     synclog: '同步搜索',
+    kefu: '客服查询',
     introduction: '简述',
     documentation: '文档',
     guide: '引导页',

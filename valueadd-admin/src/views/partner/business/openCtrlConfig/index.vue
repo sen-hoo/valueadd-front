@@ -5,57 +5,57 @@
         </div>
         <div class="table-container">
             <el-table :data="cpServiceCtrlList" v-loading="listLoading" stripe highlight-current-row height="800">
-              <el-table-column label="开始时间">
+              <el-table-column align="center" label="开始时间">
                   <template slot-scope="scope">
                       <span>{{scope.row.beginTime}}</span>
                   </template>
               </el-table-column>
-              <el-table-column label="结束时间">
+              <el-table-column align="center" label="结束时间">
                   <template slot-scope="scope">
                     <span>{{scope.row.endTime}}</span>
                   </template>
               </el-table-column>
-              <el-table-column label="日限(元)">
+              <el-table-column align="center" label="日限(元)">
                   <template slot-scope="scope">
                       <span>{{scope.row.dayProfitLimit}}</span>
                   </template>
               </el-table-column>
-              <el-table-column label="月限(元)">
+              <el-table-column align="center" label="月限(元)">
                   <template slot-scope="scope">
                       <span>{{scope.row.monthProfitLimit}}</span>
                   </template>
               </el-table-column>
-              <el-table-column label="用户日限(元)">
+              <el-table-column align="center" label="用户日限(元)">
                   <template slot-scope="scope">
                       <span>{{scope.row.dayUserLimit}}</span>
                   </template>
               </el-table-column>
-              <el-table-column label="用户月限(元)">
+              <el-table-column align="center" label="用户月限(元)">
                   <template slot-scope="scope">
                       <span>{{scope.row.monthUserLimit}}</span>
                   </template>
               </el-table-column>
-              <el-table-column label="省份">
+              <el-table-column align="center" label="省份">
                   <template slot-scope="scope">
                       <span>{{scope.row.province}}</span>
                   </template>
               </el-table-column>
-              <el-table-column label="关闭地市">
+              <el-table-column align="center" label="关闭地市">
                   <template slot-scope="scope">
                       <span>{{scope.row.closedCity}}</span>
                   </template>
               </el-table-column>
-              <el-table-column label="规避数">
+              <el-table-column align="center" label="规避数">
                   <template slot-scope="scope">
                       <span>{{scope.row.deductNumber}}</span>
                   </template>
               </el-table-column>
-              <el-table-column label="规避基数">
+              <el-table-column align="center" label="规避基数">
                   <template slot-scope="scope">
                       <span>{{scope.row.deductBaseNumber}}</span>
                   </template>
               </el-table-column>
-              <el-table-column label="规避类型">
+              <el-table-column align="center" label="规避类型">
                   <template slot-scope="scope">
                       <span v-if="scope.row.status == 0">不规避</span>
                       <span v-else-if="scope.row.status == 1">规避MO/MR</span>
@@ -63,7 +63,7 @@
                       <span v-else>未知</span>
                   </template>
               </el-table-column>
-              <el-table-column label="状态">
+              <el-table-column align="center" label="状态">
                   <template slot-scope="scope">
                       <span v-if="scope.row.status == 1">打开</span>
                       <span v-else-if="scope.row.status == 0">关闭</span>
@@ -71,7 +71,7 @@
                   </template>
               </el-table-column>
 
-              <el-table-column label="操作">
+              <el-table-column align="center" label="操作">
                   <template slot-scope="scope">
                       <el-button size="small" type="primary" icon="el-icon-edit" @click="handleEdit(scope.row)">修改</el-button>
                   </template>

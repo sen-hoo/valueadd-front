@@ -2,9 +2,34 @@
     <div class="dashboard-container">
         <div class="dashboard-editor-container">
             <github-corner style="position: absolute; top: 0px; border: 0; right: 0;"></github-corner>
-
+            <div class="filter-container">
+                <span class="filter-item">日期：</span>
+                <el-date-picker v-model="queryParams.startDate" type="date" placeholder="选择日期" class="filter-item"></el-date-picker>
+                <span class="filter-item">业务代码：</span>
+                <el-select v-model="queryParams.serivceCode" class="filter-item">
+                    <el-option v-for="item in serviceCodeList" :key="item.value" :label="item.lable" :value="item.value"></el-option>
+                </el-select>
+                <span class="filter-item">省份：</span>
+                <el-select v-model="queryParams.serivceCode" class="filter-item">
+                    <el-option v-for="item in provinceList" :key="item.value" :label="item.lable" :value="item.value"></el-option>
+                </el-select>
+                <el-checkbox v-model="timerRefresh" class="filter-item" style="margin-left:20px;">定时刷新</el-checkbox>
+            </div>
             <panel-group @handleSetLineChartData="handleSetLineChartData"></panel-group>
             <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+                <div>
+                    <span>合作方矩形图：</span>
+                </div>
+            </el-row>
+            <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+                <div>
+                    <span>分省矩形图：</span>
+                </div>
+            </el-row>
+            <el-row style="background:#fff;padding:16px 16px 0;margin-bottom:32px;">
+                <div>
+                    <span>分时曲线图：</span>
+                </div>
                 <line-chart :chart-data="lineChartData"></line-chart>
             </el-row>
         </div>
@@ -43,7 +68,14 @@ export default {
     },
     data() {
         return {
-            lineChartData: lineChartData.newVisitis
+            lineChartData: lineChartData.newVisitis,
+            queryParams: {
+                serviceCode: undefined,
+                startDate: undefined
+            },
+            serviceCodeList: null,
+            provinceList: null,
+            timerRefresh: false
         }
     },
     methods: {

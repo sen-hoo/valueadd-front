@@ -255,6 +255,17 @@ partnerRouter,
       //icon: 'table',
       // if do not set roles, means: this page does not require permission
     }
+  },
+  {//客服管理
+    path: "kefu/index",
+    component: () =>
+      import("@/views/search/kefu/index"),
+    name: "kefu",
+    meta: {
+      title: "kefu",
+      //icon: 'table',
+      // if do not set roles, means: this page does not require permission
+    }
   }]
 }
 ]
