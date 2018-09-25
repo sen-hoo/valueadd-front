@@ -10,7 +10,7 @@ export function fetchServiceCodeList(query) {
 
 export function fetchAllServiceCode(clause) {
     return request({
-        url: '/serviceCode/listall',
+        url: '/serviceCode/listAll',
         method: 'get',
         params: clause
     })

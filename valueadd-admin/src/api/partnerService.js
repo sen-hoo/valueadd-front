@@ -8,6 +8,14 @@ export function fetchPartnerServiceList(query) {
     })
 }
 
+export function fetchAllPartnerServiceList(query) {
+    return request({
+        url: '/partnerService/listAll',
+        method: 'get',
+        params: query
+    })
+}
+
 export function addPartnerService(partnerService) {
     return request({
         url: '/partnerService/add',

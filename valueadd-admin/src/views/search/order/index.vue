@@ -3,9 +3,9 @@
         <div class="filter-container">
             <div class="filter-item">
                 <span class="filter-item">开始时间：</span>
-                <el-date-picker v-model="listQuery.startDate" type="datetime" placeholder="开始时间" class="filter-item"></el-date-picker>
+                <el-date-picker v-model="listQuery.startTime" type="datetime" placeholder="开始时间" format="yyyy-MM-dd HH:mm:ss" class="filter-item"></el-date-picker>
                 <span class="filter-item">结束时间：</span>
-                <el-date-picker v-model="listQuery.endDate" type="datetime" placeholder="结束时间" class="filter-item"></el-date-picker>
+                <el-date-picker v-model="listQuery.endTime" type="datetime" placeholder="结束时间" format="yyyy-MM-dd HH:mm:ss" class="filter-item"></el-date-picker>
                 <span class="filter-item" style="margin-left:10px;">状态：</span>
                 <el-checkbox-group v-model="listQuery.statusList" class="filter-item">
                     <el-checkbox label="DELIVRD">成功</el-checkbox>
@@ -20,17 +20,17 @@
             </div>
             <div>
                 <span class="filter-item"> 业务代码：</span>
-                <el-select v-model="listQuery.serviceCodeId" placeholder="请选择业务代码" @change="onPartnerSelected" class="filter-item">
-                    <el-option v-for="item in partnerList" :key="item.cpId" :label="item.cpName" :value="item.cpId"></el-option>
+                <el-select v-model="listQuery.sCodePKId" placeholder="请选择业务代码" class="filter-item">
+                    <el-option v-for="item in serviceCodeList" :key="item.codePk" :label="item.codeId + ' | ' + item.codeName" :value="item.codePk"></el-option>
                 </el-select>
                 <span class="filter-item">合作方业务：</span>
-                <el-select v-model="listQuery.partnerId" placeholder="请选择合作方业务" @change="onPartnerSelected" class="filter-item">
-                    <el-option v-for="item in partnerList" :key="item.cpId" :label="item.cpName" :value="item.cpId"></el-option>
+                <el-select v-model="listQuery.servicePKId" placeholder="请选择合作方业务" class="filter-item">
+                    <el-option v-for="item in cpServiceList" :key="item.servicePkid" :label="item.serviceName + ' | ' + item.cpName" :value="item.servicePkid"></el-option>
                 </el-select>
             </div>
             <div style="float: right;" class="filter-item">
-                <el-button type="primary" class="filter-item" @click="searchByKeyword">重置</el-button>
-                <el-button type="primary" class="filter-item" icon="el-icon-search" @click="searchByKeyword">搜索</el-button>
+                <el-button type="primary" class="filter-item" @click="resetQueryParams">重置</el-button>
+                <el-button type="primary" class="filter-item" icon="el-icon-search" @click="searchButtonClick">搜索</el-button>
                 <el-button type="primary" class="filter-item" @click="exportData">导出</el-button>
                 <el-button type="primary" class="filter-item" @click="reSyncPartner">重新同步</el-button>
             </div>
@@ -101,29 +101,96 @@
     </div>
 </template>
 <script>
+import { Message } from "element-ui";
+import { fetchValueaddList } from "@/api/valueaddOrder"
+import { fetchAllServiceCode } from "@/api/serviceCode"
+import { fetchAllPartnerServiceList } from "@/api/partnerService"
+
 export default {
     data() {
         return {
             listQuery: {
-                serviceCodeId: undefined,
-                partnerServiceId: undefined,
+                sCodePKId: undefined,
+                servicePKId: undefined,
                 statusList: ['DELIVRD', 'FAILED'],
                 flag: 9,
                 startTime: undefined,
-                endTime: undefined,
+                endTime: new Date(),
                 pageSize: 20,
                 pageNumber: 1
             },
             total: 0,
+            serviceCodeList: null,
+            cpServiceList: null,
+            listLoading: false,
             valueaddOrderList: null,
 
         }
     },
     methods: {
+        resetQueryParams() {
+            let currTime = new Date()
+            this.listQuery = {
+                sCodePKId: undefined,
+                servicePKId: undefined,
+                statusList: ['DELIVRD', 'FAILED'],
+                flag: 9,
+                startTime: new Date(currTime.getFullYear(), currTime.getMonth(), currTime.getDate(), 0, 0, 0) ,
+                endTime: new Date(),
+                pageSize: 20,
+                pageNumber: 1
+            }
+        },
+        searchButtonClick() {
+            this.listLoading = true
+            this.fetchValueaddList()
+            setTimeout(() => { this.listLoading = false }, 1.5 * 1000);
+        },
+        fetchValueaddList() {
+            console.log(JSON.stringify(this.listQuery))
+            fetchValueaddList(this.listQuery).then((res)=> {
+                if (res.code === 0) {
+                    this.valueaddOrderList = res.data.valueaddOrderList
+                    this.total = res.data.page.total
+                } else {
+                    this.listLoading = false
+                    Message({ message: res.data.msg, type: "error", duration: 2 * 1000})
+                }
+            })
+        },
+         handleCurrentChange(pageNumber) {
+            this.listQuery.pageNumber = pageNumber;
+            this.searchButtonClick();
+        },
+        handleSizeChange(pageSize) {
+            this.listQuery.pageSize = pageSize;
+            this.searchButtonClick();
+        },
+        reSyncPartner() {
+
+        },
+        exportData() {
+
+        }
+
 
     },
     created() {
-
+        let currTime = new Date()
+        console.log(new Date())
+        console.log(JSON.stringify(currTime))
+        this.listQuery.startTime = new Date(currTime.getFullYear(), currTime.getMonth(), currTime.getDate(), 0, 0, 0)
+        fetchAllPartnerServiceList({}).then((res) => {
+            if (res.code === 0) {
+                this.cpServiceList = res.data.cpServiceList
+            }
+        })
+        fetchAllServiceCode({}).then((res)=>{
+            if (res.code === 0) {
+                this.serviceCodeList = res.data.serviceCodeList
+            }
+        })
+        console.log(JSON.stringify(this.listQuery))
     }
 
 }
