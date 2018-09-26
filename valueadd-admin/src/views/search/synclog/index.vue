@@ -102,6 +102,18 @@ export default {
 
     },
     created() {
+        let traceId = this.$route.params && this.$route.params.traceId
+        if (traceId != null) {
+            this.listQuery.traceId = traceId
+            fetchSyncCPLogList(this.listQuery).then((res)=>{
+                if (res.code === 0) {
+                    this.syncCPLogList = res.data.syncCPLogList
+                } else {
+                    Message({ message: res.data.msg, type: "error", duration: 2 * 1000})
+                }
+
+            })
+        }
         fetchAllPartnerServiceList({}).then((res) => {
             if (res.code === 0) {
                 this.cpServiceList = res.data.cpServiceList

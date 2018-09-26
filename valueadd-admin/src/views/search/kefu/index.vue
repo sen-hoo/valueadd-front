@@ -23,7 +23,7 @@
                         <span>{{scope.row.feeCode}}</span>
                     </template>
                 </el-table-column>
-                <el-table-column align="center" label="订购号码">
+                <el-table-column align="center" label="长号码">
                     <template slot-scope="scope">
                         <span>{{scope.row.srcTermid}}</span>
                     </template>
@@ -45,7 +45,7 @@
                 </el-table-column>
                 <el-table-column align="center" label="上行时间">
                     <template slot-scope="scope">
-                        <span>{{scope.row.moTime}}</span>
+                        <span>{{packageTimeParser(scope.row.moTime)}}</span>
                     </template>
                 </el-table-column>
                 <el-table-column align="center" label="下行内容">
@@ -55,12 +55,12 @@
                 </el-table-column>
                 <el-table-column align="center" label="下行时间">
                     <template slot-scope="scope">
-                        <span>{{scope.row.sendTime}}</span>
+                        <span>{{packageTimeParser(scope.row.sendTime)}}</span>
                     </template>
                 </el-table-column>
                 <el-table-column align="center" label="成功时间">
                     <template slot-scope="scope">
-                        <span>{{scope.row.succTime}}</span>
+                        <span>{{packageTimeParser(scope.row.succTime)}}</span>
                     </template>
                 </el-table-column>
                 <el-table-column align="center" label="状态">
@@ -82,6 +82,7 @@
     </div>
 </template>
 <script>
+import { parseTime } from "@/utils"
 import { Message } from "element-ui";
 import { fetchKefuValueaddOrderList } from "@/api/kefu";
 export default {
@@ -104,7 +105,12 @@ export default {
     methods: {
         fetchList() {
             if (this.listQuery.mobile === '') this.listQuery.mobile = undefined
-            fetchKefuValueaddOrderList(this.listQuery).then((res)=>{
+            let params = Object.assign({}, this.listQuery)
+            if (this.listQuery.startTime != null)
+                params.startTime = parseTime(params.startTime, '{y}-{m}-{d}')//转移为字符串
+            if (this.listQuery.endTime != null)
+                params.endTime = parseTime(params.endTime, '{y}-{m}-{d}')//转移为字符串
+            fetchKefuValueaddOrderList(params).then((res)=>{
                 if (res.code === 0) {
                     this.valueaddOrderList = res.data.valueaddOrderList
                     this.total = res.data.page.total
@@ -122,9 +128,16 @@ export default {
             this.searchButtonClick();
         },
         searchButtonClick() {
+            if (this.listQuery.mobile == null) {
+                Message({ message: '手机号码不能为空', type: "error", duration: 2 * 1000})
+                return ;
+            }
             this.listLoading = true
             this.fetchList()
             setTimeout(() => { this.listLoading = false }, 1.5 * 1000);
+        },
+        packageTimeParser(timeStamp) {
+            return parseTime(timeStamp)
         }
     },
     created() {
