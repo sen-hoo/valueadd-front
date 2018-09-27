@@ -47,3 +47,11 @@ export function getCPSN(partnerId) {
         params: partnerId
     })
 }
+
+export function reloadPartnerService(partnerServicePKId) {
+    return request({
+        url: '/partnerService/reload',
+        method: 'get',
+        params: partnerServicePKId
+    })
+}

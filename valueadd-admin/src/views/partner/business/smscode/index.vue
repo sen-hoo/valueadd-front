@@ -93,6 +93,7 @@
                                 <router-link :to="{name:'serviceCtrlConfig', params:{servicePkid: scope.row.servicePkid, serviceId: scope.row.serviceId, serviceName: scope.row.serviceName}}">
                                     <el-dropdown-item>开通省份</el-dropdown-item>
                                 </router-link>
+                                <el-dropdown-item @click.native="reloadPartnerServiceClick(scope.row)">重载业务</el-dropdown-item>
                                 <el-dropdown-item @click.native="editPartnerServiceClick(scope.row)" divided command>编辑</el-dropdown-item>
                                 <el-dropdown-item @click.native="deletePartnerServiceClick(scope.row)">删除</el-dropdown-item>
                             </el-dropdown-menu>
@@ -272,7 +273,7 @@
 <script>
 import { Message } from "element-ui";
 import { fetchPartnerList } from "@/api/partner";
-import { fetchPartnerServiceList, getCPSN, addPartnerService, editPartnerService, deletePartnerService } from "@/api/partnerService";
+import { fetchPartnerServiceList, getCPSN, addPartnerService, editPartnerService, deletePartnerService, reloadPartnerService } from "@/api/partnerService";
 import { addPartnerServiceRoute, editPartnerServiceRoute, deletePartnerServiceRoute } from '@/api/partnerServiceRoute'
 import { fetchAllServiceCode } from '@/api/serviceCode';
 import { fetchServiceCodeRouteList } from '@/api/serviceCodeRoute'
@@ -587,6 +588,15 @@ export default {
         },
         deleteServiceRoute(row) {
             
+        },
+        reloadPartnerServiceClick(row) {
+            reloadPartnerService({partnerServicePKId: row.servicePkid}).then((res)=> {
+                if (res.code === 0) {
+                    this.$notify({title: "成功", message: "重载业务成功", type: "success", duration: 2000})
+                } else {
+                    this.$notify({title: "失败", message: "重载业务失败，请重试", type: "error", duration: 2000})
+                }
+            })
         },
         submitForm(formName) {
             this.$refs[formName].validate(valid => {
